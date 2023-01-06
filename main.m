@@ -73,7 +73,7 @@ allProperlyRecognizedLettersCount = 0;
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-optimizationOptions = optimoptions('ga', 'Display', 'final', 'MaxGenerations', 100, 'PopulationSize', 1000, 'UseParallel', true, 'UseVectorized', false);
+optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', 100, 'PopulationSize', 1000, 'UseParallel', true, 'UseVectorized', false);
 % run the ga algorithm for every letter and every person
 for i=1:letterNum
     disp("Letter: "+templateNames{i});
