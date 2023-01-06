@@ -20,13 +20,13 @@ writematrix(lettersVector', fileName, 'Range', 'C2');
 [rowNum, colNum] = size(resultCell);
 confusionMatrix = zeros(rowNum);
 for i=1:rowNum
-    actLetter = lettersVector{i};
+    actLetter = lettersVector(i);
     for j=1:colNum
         [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, actLetter);
         colIdx = foundRowIdx;
-        [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, resultCell{i,j});
+        [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, string(resultCell{i,j}));
         rowIdx = foundRowIdx;
-        disp("row:"+rowIdx+" col:"+colIdx);
+        %disp("row:"+rowIdx+" col:"+colIdx);
         if rowIdx > 0 && colIdx > 0
             confusionMatrix(rowIdx, colIdx) = confusionMatrix(rowIdx, colIdx) + 1;
         end
