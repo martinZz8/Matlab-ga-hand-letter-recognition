@@ -4,7 +4,7 @@ clear;
 clc;
 %% load templates
 tempFolderName = "templates/";
-tempNames = [
+tempCloudNames = [
     tempFolderName+"aSkeleton.txt";
     tempFolderName+"bSkeleton.txt";
     tempFolderName+"cSkeleton.txt";
@@ -22,9 +22,13 @@ tempNames = [
     tempFolderName+"wSkeleton.txt";
     tempFolderName+"ySkeleton.txt";
     ];
-templateClouds = cell(size(tempNames));
-for i=1:size(tempNames,1)
-    templateClouds{i}=loadSkeleton(tempNames(i));
+templateClouds = cell(size(tempCloudNames));
+templatesCloudsLength = numel(templateClouds);
+for i=1:templatesCloudsLength
+    templateClouds{i}=loadSkeleton(tempCloudNames(i));
+end
+for i=1:templatesCloudsLength
+    templateClouds{i} = shiftCloud(templateClouds{i});
 end
 templateNames = { ...
     'A'; ...
@@ -44,14 +48,10 @@ templateNames = { ...
     'W'; ...
     'Y'; ...
     };
-templatesCount = numel(templateClouds);
-for i=1:numel(templateNames)
-    templateClouds{i} = shiftCloud(templateClouds{i});
-end
 %% get point cloud of every letter and every person
-unknownClouds = cell(templatesCount,10);
+unknownClouds = cell(templatesCloudsLength,10);
 datasetLocation = "dataset/";
-for i=1:templatesCount
+for i=1:templatesCloudsLength
     datasetLocationLetter = datasetLocation+templateNames{i}+"/";
     d = dir(datasetLocationLetter+"*.txt");
     %disp("letter: "+templateNames{i});
@@ -73,7 +73,7 @@ allProperlyRecognizedLettersCount = 0;
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', 100, 'PopulationSize', 1000, 'UseParallel', true, 'UseVectorized', false);
+optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', 50, 'PopulationSize', 250, 'UseParallel', true, 'UseVectorized', false);
 % run the ga algorithm for every letter and every person
 for i=1:letterNum
     disp("Letter: "+templateNames{i});
@@ -95,16 +95,14 @@ for i=1:letterNum
 end
 %% count the whole accuracy
 wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
-disp("letter acc:"+letterRecognitionAccuracy);
-disp("whole acc: "+wholeAccuracy);
+%disp("letter acc:"+letterRecognitionAccuracy);
+%disp("whole acc: "+wholeAccuracy);
 %% save results to .xlsx file
-fileName = "results.xlsx";
-%delete(fileName);
+fileName = "results.xlsx"; %delete(fileName);
 nextFileName = getNextFileName(fileName);
 saveResults(nextFileName, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy]);
 %% save confusion matrix to .xlsx file
-fileName = "confusionMatrix.xlsx";
-%delete(fileName);
+fileName = "confusionMatrix.xlsx"; %delete(fileName);
 nextFileName = getNextFileName(fileName);
 saveConfusionMatrix(nextFileName, string(templateNames), convertStringsToChars(recognizedLetters), true);
 disp("---- End of script ----");
