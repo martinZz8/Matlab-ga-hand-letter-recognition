@@ -1,2 +1,4 @@
 # excel files
 *.xlsx
+# temporary files
+*.asv
