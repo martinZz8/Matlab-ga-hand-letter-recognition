@@ -1,7 +1,7 @@
 % Create numerous/percentage confusion matrix, that has in:
 % - row: results that should be acquired
 % - column: acquired result
-function [] = saveConfusionMatrix(fileName, lettersVector, resultCell, isPercentage)
+function [] = saveConfusionMatrix(fileName, lettersVector, resultMatrix, isPercentage)
 % write information on data type
 dataTypeToWrite = "numerous values";
 if isPercentage
@@ -17,14 +17,14 @@ writematrix("actual values", fileName, 'Range', 'C1');
 % write letters row vector
 writematrix(lettersVector', fileName, 'Range', 'C2');
 % create the confusion matrix
-[rowNum, colNum] = size(resultCell);
+[rowNum, colNum] = size(resultMatrix);
 confusionMatrix = zeros(rowNum);
 for i=1:rowNum
     actLetter = lettersVector(i);
     for j=1:colNum
         [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, actLetter);
         colIdx = foundRowIdx;
-        [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, string(resultCell{i,j}));
+        [foundRowIdx, ~] = findFirstIndexInMatrix(lettersVector, resultMatrix(i,j));
         rowIdx = foundRowIdx;
         %disp("row:"+rowIdx+" col:"+colIdx);
         if rowIdx > 0 && colIdx > 0
