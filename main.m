@@ -79,7 +79,7 @@ for i=1:letterNum
         fitnessFunLambda = @(X) fitnessFun(X, unknownClouds{i,j}, templateClouds);
         rng default;
         [Xmin, Jmin] = ga(fitnessFunLambda, length(lb), [], [], [], [], lb, ub, [], [], optimizationOptions);
-        [~, ~, winingTemplateIndex] = fitnessFun(Xmin, unknownCloud, templateClouds);
+        [~, ~, winingTemplateIndex] = fitnessFun(Xmin, unknownClouds{i,j}, templateClouds);
         recognizedClass = templateNames{winingTemplateIndex, 1};
         recognizedLetters(i,j) = recognizedClass;
         if recognizedClass == templateNames{i}
