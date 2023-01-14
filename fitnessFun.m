@@ -9,6 +9,6 @@ transformedCloud = pctransform(rotatedCloud, tform);
 templatesCount = numel(templateClouds);
 Js = zeros(templatesCount, 1);
 for templateIndex=1:templatesCount
-    Js(templateIndex, 1) = HausdorffDist(templateClouds{templateIndex}.Location, transformedCloud.Location);
+    Js(templateIndex, 1) = sum(abs(templateClouds{templateIndex}.Location - transformedCloud.Location), 'all');
 end
 [J, winningTemplateIndex] = min(Js);
