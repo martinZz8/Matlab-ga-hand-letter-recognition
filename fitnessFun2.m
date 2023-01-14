@@ -1,5 +1,5 @@
-% Uses standard subtract to establish dimension between two points
-function [J, transformedCloud, winningTemplateIndex] = fitnessFun(X, unknownCloud, templateClouds)
+% Uses euclidean function to establish dimension between two points
+function [J, transformedCloud, winningTemplateIndex] = fitnessFun2(X, unknownCloud, templateClouds)
 tform = rigidtform3d(eye(3,3), [X(1), X(2), 0]);
 translatedCloud = pctransform(unknownCloud, tform);
 [cx, cy, cz] = getPointCloudCoG(translatedCloud);
@@ -10,6 +10,10 @@ transformedCloud = pctransform(rotatedCloud, tform);
 templatesCount = numel(templateClouds);
 Js = zeros(templatesCount, 1);
 for templateIndex=1:templatesCount
-    Js(templateIndex, 1) = sum(abs(templateClouds{templateIndex}.Location - transformedCloud.Location), 'all');
+    diffsCloud = abs(templateClouds{templateIndex}.Location - transformedCloud.Location);
+    for i=1:length(diffsCloud)
+        euclideanLength = sqrt(diffsCloud(i,1)^2 + diffsCloud(i,2)^2);
+        Js(templateIndex, 1) = Js(templateIndex, 1) + euclideanLength;
+    end
 end
 [J, winningTemplateIndex] = min(Js);
