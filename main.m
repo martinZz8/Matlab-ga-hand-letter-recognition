@@ -46,6 +46,7 @@ templateNames = { ...
     'Y'; ...
     };
 %% get point cloud of every letter and every person
+% don't initialize (or change the number) 'unknownClouds' when number of persons in each dataset/letter folders are other than 10
 unknownClouds = cell(templatesCloudsLength,10);
 datasetLocation = "dataset/";
 for i=1:templatesCloudsLength
