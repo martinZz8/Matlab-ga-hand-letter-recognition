@@ -2,12 +2,16 @@
 % for files in manner: {fileName}_{fileVersion}.{fileExtension}
 % input:
 %       fileName - name of the file with extention, but without the number
-function [num] = getLastFileNameNumber(fileName)
+function [num] = getLastFileNameNumber(fileName, parentPathToFile)
 biggestNum = 0;
 num = biggestNum;
 splittedText = fileName.split(".");
 if length(splittedText) > 1
-    d = dir(splittedText(1)+"*."+splittedText(2));
+    fileNameToSearch = splittedText(1)+"*."+splittedText(2);
+    if parentPathToFile ~= ""
+        fileNameToSearch = parentPathToFile + fileNameToSearch;
+    end
+    d = dir(fileNameToSearch);
     for i=1:length(d)
         name = convertCharsToStrings(d(i).name);
         splittedText2 = name.split(".");

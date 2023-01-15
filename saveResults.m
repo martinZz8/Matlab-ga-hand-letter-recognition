@@ -1,4 +1,4 @@
-function [] = saveResults(fileName, lettersVector, personsNum, resultMatrix, lettersAccuracyVector)
+function [] = saveResults(fileName, lettersVector, personsNum, resultMatrix, lettersAccuracyVector, description)
 % write letters column vector
 writematrix(lettersVector, fileName, 'Range', 'A2');
 % write persons row vector
@@ -13,3 +13,5 @@ writematrix(resultMatrix, fileName, 'Range', 'B2');
 % write accuracy matrix
 startChar = char(double('A')+personsNum+1);
 writematrix(lettersAccuracyVector, fileName, 'Range', startChar+"2");
+% write description
+writematrix(description, fileName, 'Range', "A"+string(length(lettersVector)+3), 'AutoFitWidth', false);
