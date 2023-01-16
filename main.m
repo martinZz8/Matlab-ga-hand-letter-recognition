@@ -83,6 +83,8 @@ metricMap = containers.Map(keyFuncSet,valueFuncSet);
 optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
 % run the ga algorithm for every letter and every person
 fitnessFunHandle = metricMap(metric);
+% start the timer
+tStart = tic;
 for i=1:letterNum
     disp("Letter: "+templateNames{i});
     properlyRecognizedLettersCount = 0;
@@ -105,6 +107,11 @@ for i=1:letterNum
     letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
     allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
 end
+%% stop the timer and print time results
+tEnd = toc(tStart);
+tEndMin = floor(tEnd / 60);
+tEndSec = floor(mod(tEnd, 60));
+disp("Elapsed time: "+tEndMin+" min "+tEndSec+" sec");
 %% count the whole accuracy
 wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
 %disp("letter acc:"+letterRecognitionAccuracy);
