@@ -6,7 +6,7 @@ for i=1:rowNum
     for j=1:colNum
         if characterStrToFind == matrix(i,j)
             rowIdx = i;
-            colNum = j;
+            colIdx = j;
             canEnd = true;
             break;
         end
