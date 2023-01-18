@@ -66,11 +66,10 @@ end
 [letterNum, personsNum] = size(unknownClouds);
 recognizedLetters = string(zeros(letterNum,personsNum));
 letterRecognitionAccuracy = zeros(letterNum,1);
-allProperlyRecognizedLettersCount = 0;
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-maxGenerationsVector = [10, 30, 50, 70, 90, 100, 120];
+maxGenerationsVector = [30, 50, 70, 90, 100, 120]; %out 10 - perform 10, xxxx for euclidean
 populationSizeVector = [10, 20, 60, 100, 150, 200, 300, 400, 500, 1000];
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
@@ -83,6 +82,7 @@ for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
+            allProperlyRecognizedLettersCount = 0;
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
             optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
             % start the timer
@@ -144,7 +144,7 @@ for metric=metricVector
             fileName = "confusionMatrix.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
             saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
-            disp("---- End of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + "script ----");
+            disp("---- End of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
         end
     end 
 end
