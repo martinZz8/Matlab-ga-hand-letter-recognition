@@ -70,8 +70,8 @@ allProperlyRecognizedLettersCount = 0;
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-maxGenerations = 10;
-populationSize = 100;
+maxGenerations = 2;
+populationSize = 10;
 metric = "manhattan";
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
@@ -111,7 +111,7 @@ end
 tEnd = toc(tStart);
 tEndMin = floor(tEnd / 60);
 tEndSec = floor(mod(tEnd, 60));
-elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec";
+elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
 disp(elapsedTimeStr);
 %% count the whole accuracy
 wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
