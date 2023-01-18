@@ -70,74 +70,82 @@ allProperlyRecognizedLettersCount = 0;
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-maxGenerations = 10;
-populationSize = 100;
-metric = "manhattan";
+maxGenerationsVector = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+populationSizeVector = [30, 40, 50, 60, 70, 80, 90, 100];
+metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
-% NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
-% run the ga algorithm for every letter and every person
-fitnessFunHandle = metricMap(metric);
-% start the timer
-tStart = tic;
-for i=1:letterNum
-    disp("Letter: "+templateNames{i});
-    properlyRecognizedLettersCount = 0;
-    for j=1:personsNum
-        % OLD
-        %fitnessFunLambda = @(X) fitnessFun1(X, unknownClouds{i,j}, templateClouds);
-        fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
-        rng default;
-        [Xmin, Jmin] = ga(fitnessFunLambda, length(lb), [], [], [], [], lb, ub, [], [], optimizationOptions);
-        % OLD
-        %[~, ~, winingTemplateIndex] = fitnessFun1(Xmin, unknownClouds{i,j}, templateClouds);
-        [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
-        recognizedClass = templateNames{winingTemplateIndex, 1};
-        recognizedLetters(i,j) = recognizedClass;
-        if recognizedClass == templateNames{i}
-            properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+for metric=metricVector
+    for maxGenerations=maxGenerationsVector
+        for populationSize=populationSizeVector
+            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
+            optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
+            % run the ga algorithm for every letter and every person
+            fitnessFunHandle = metricMap(metric);
+            % start the timer
+            tStart = tic;
+            for i=1:letterNum
+                disp("Letter: "+templateNames{i});
+                properlyRecognizedLettersCount = 0;
+                for j=1:personsNum
+                    % OLD
+                    %fitnessFunLambda = @(X) fitnessFun1(X, unknownClouds{i,j}, templateClouds);
+                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                    rng default;
+                    [Xmin, Jmin] = ga(fitnessFunLambda, length(lb), [], [], [], [], lb, ub, [], [], optimizationOptions);
+                    % OLD
+                    %[~, ~, winingTemplateIndex] = fitnessFun1(Xmin, unknownClouds{i,j}, templateClouds);
+                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                    recognizedClass = templateNames{winingTemplateIndex, 1};
+                    recognizedLetters(i,j) = recognizedClass;
+                    if recognizedClass == templateNames{i}
+                        properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                    end
+                    %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                end
+                letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
+                allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
+            end
+            %% stop the timer and print time results
+            tEnd = toc(tStart);
+            tEndMin = floor(tEnd / 60);
+            tEndSec = floor(mod(tEnd, 60));
+            elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec";
+            disp(elapsedTimeStr);
+            %% count the whole accuracy
+            wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
+            %disp("letter acc:"+letterRecognitionAccuracy);
+            %disp("whole acc: "+wholeAccuracy);
+            %% prepare folder for saving results
+            disp("Saving results to files");
+            % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
+            isArchiveDir = true;
+            description =   "gen="+maxGenerations+...
+                            "_pop="+populationSize+...
+                            "_metric="+metric;
+            folderName = description;
+            parentFolderName = "archive";
+            if isArchiveDir
+                mkdir(parentFolderName, folderName);
+            end
+            %% save results to .xlsx file
+            currentFolderName = "";
+            if isArchiveDir
+                currentFolderName = parentFolderName+"/"+folderName;
+            end
+            fileName = "results.xlsx"; %delete(fileName);
+            fileNameToSave = getProperFileName(fileName, currentFolderName);
+            saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description);
+            %% save confusion matrix to .xlsx file
+            fileName = "confusionMatrix.xlsx"; %delete(fileName);
+            fileNameToSave = getProperFileName(fileName, currentFolderName);
+            saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description);
+            disp("---- End of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + "script ----");
         end
-        %disp(templateNames{i}+") Recognized class: "+recognizedClass);
-    end
-    letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
-    allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
+    end 
 end
-%% stop the timer and print time results
-tEnd = toc(tStart);
-tEndMin = floor(tEnd / 60);
-tEndSec = floor(mod(tEnd, 60));
-disp("Elapsed time: "+tEndMin+" min "+tEndSec+" sec");
-%% count the whole accuracy
-wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
-%disp("letter acc:"+letterRecognitionAccuracy);
-%disp("whole acc: "+wholeAccuracy);
-%% prepare folder for saving results
-disp("Saving results to files");
-% if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-isArchiveDir = true;
-description =   "gen="+maxGenerations+...
-                "_pop="+populationSize+...
-                "_metric="+metric;
-folderName = description;
-parentFolderName = "archive";
-if isArchiveDir
-    mkdir(parentFolderName, folderName);
-end
-%% save results to .xlsx file
-currentFolderName = "";
-if isArchiveDir
-    currentFolderName = parentFolderName+"/"+folderName;
-end
-fileName = "results.xlsx"; %delete(fileName);
-fileNameToSave = getProperFileName(fileName, currentFolderName);
-saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description);
-%% save confusion matrix to .xlsx file
-fileName = "confusionMatrix.xlsx"; %delete(fileName);
-fileNameToSave = getProperFileName(fileName, currentFolderName);
-saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description);
-disp("---- End of script ----");
+disp("**---- End of script ----**");
