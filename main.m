@@ -114,7 +114,7 @@ for metric=metricVector
             tEnd = toc(tStart);
             tEndMin = floor(tEnd / 60);
             tEndSec = floor(mod(tEnd, 60));
-            elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec";
+            elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
             disp(elapsedTimeStr);
             %% count the whole accuracy
             wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
@@ -139,11 +139,11 @@ for metric=metricVector
             end
             fileName = "results.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description);
+            saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
             %% save confusion matrix to .xlsx file
             fileName = "confusionMatrix.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description);
+            saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
             disp("---- End of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + "script ----");
         end
     end 

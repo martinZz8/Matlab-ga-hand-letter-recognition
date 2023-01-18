@@ -1,7 +1,7 @@
 % Create numerous/percentage confusion matrix, that has in:
 % - row: results that should be acquired
 % - column: acquired result
-function [] = saveConfusionMatrix(fileName, lettersVector, resultMatrix, isPercentage, description)
+function [] = saveConfusionMatrix(fileName, lettersVector, resultMatrix, isPercentage, description, elapsedTimeStr)
 % write information on data type
 dataTypeToWrite = "numerous values";
 if isPercentage
@@ -43,4 +43,7 @@ end
 % write confusion matrix
 writematrix(confusionMatrix, fileName, 'Range', 'C3');
 % write description
-writematrix(description, fileName, 'Range', "A"+string(length(lettersVector)+4), 'AutoFitWidth', false);
+additionRowNum = length(lettersVector)+4;
+writematrix(description, fileName, 'Range', "A"+string(additionRowNum), 'AutoFitWidth', false);
+% write elapsed time info
+writematrix(elapsedTimeStr, fileName, 'Range', "A"+string(additionRowNum+1), 'AutoFitWidth', false);
