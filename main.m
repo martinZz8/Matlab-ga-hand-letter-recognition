@@ -80,14 +80,14 @@ valueFuncSet = {
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
 for metric=metricVector
+    fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
             optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
-            % run the ga algorithm for every letter and every person
-            fitnessFunHandle = metricMap(metric);
             % start the timer
             tStart = tic;
+            % run the ga algorithm for every letter and every person
             for i=1:letterNum
                 disp("Letter: "+templateNames{i});
                 properlyRecognizedLettersCount = 0;
