@@ -1,4 +1,4 @@
-function [] = saveResults(fileName, lettersVector, personsNum, resultMatrix, lettersAccuracyVector, description)
+function [] = saveResults(fileName, lettersVector, personsNum, resultMatrix, lettersAccuracyVector, description, elapsedTimeStr)
 % write letters column vector
 writematrix(lettersVector, fileName, 'Range', 'A2');
 % write persons row vector
@@ -14,4 +14,7 @@ writematrix(resultMatrix, fileName, 'Range', 'B2');
 startChar = char(double('A')+personsNum+1);
 writematrix(lettersAccuracyVector, fileName, 'Range', startChar+"2");
 % write description
-writematrix(description, fileName, 'Range', "A"+string(length(lettersVector)+3), 'AutoFitWidth', false);
+additionRowNum = length(lettersVector)+3;
+writematrix(description, fileName, 'Range', "A"+string(additionRowNum), 'AutoFitWidth', false);
+% write elapsed time info
+writematrix(elapsedTimeStr, fileName, 'Range', "A"+string(additionRowNum+1), 'AutoFitWidth', false);

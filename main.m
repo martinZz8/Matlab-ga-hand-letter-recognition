@@ -111,7 +111,8 @@ end
 tEnd = toc(tStart);
 tEndMin = floor(tEnd / 60);
 tEndSec = floor(mod(tEnd, 60));
-disp("Elapsed time: "+tEndMin+" min "+tEndSec+" sec");
+elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec";
+disp(elapsedTimeStr);
 %% count the whole accuracy
 wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
 %disp("letter acc:"+letterRecognitionAccuracy);
@@ -135,9 +136,9 @@ if isArchiveDir
 end
 fileName = "results.xlsx"; %delete(fileName);
 fileNameToSave = getProperFileName(fileName, currentFolderName);
-saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description);
+saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
 %% save confusion matrix to .xlsx file
 fileName = "confusionMatrix.xlsx"; %delete(fileName);
 fileNameToSave = getProperFileName(fileName, currentFolderName);
-saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description);
+saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
 disp("---- End of script ----");
