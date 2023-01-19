@@ -70,8 +70,10 @@ allProperlyRecognizedLettersCount = 0;
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-maxGenerations = 2;
-populationSize = 10;
+%lb = [-80; -50; -90; 0.65; 0.65];
+%ub = [80; 50; 90; 1.35; 1.35];
+maxGenerations = 10;
+populationSize = 100;
 metric = "manhattan";
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
