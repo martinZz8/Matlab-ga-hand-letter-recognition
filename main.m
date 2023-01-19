@@ -62,6 +62,7 @@ for i=1:templatesCloudsLength
     end
 end
 %% define & solve optmization problem for every letter and every person; also count the accuracy for every letter
+isArchiveDir = true;
 % specify the recognizedLetters string matrix
 [letterNum, personsNum] = size(unknownClouds);
 recognizedLetters = string(zeros(letterNum,personsNum));
@@ -69,7 +70,6 @@ letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-
 maxGenerationsVector = [70, 100, 120]; %perform also: 10, 30 for euclidean
 populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
 %metricVector = ["manhattan", "euclidean"];
@@ -127,7 +127,6 @@ for metric=metricVector
             %% prepare folder for saving results
             disp("Saving results to files");
             % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-            isArchiveDir = true;
             description =   "gen="+maxGenerations+...
                             "_pop="+populationSize+...
                             "_metric="+metric;
