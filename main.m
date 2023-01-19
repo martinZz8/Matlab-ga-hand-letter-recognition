@@ -70,17 +70,16 @@ letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
+%lb = [-160; -170; -90; 0.75; 0.75];
+%ub = [160; 170; 90; 1.25; 1.25];
 maxGenerationsVector = [100]; %perform also: 10, 30, 70 for euclidean
 populationSizeVector = [60, 100, 300, 500];
 % INITIAL
 %maxGenerationsVector = [10, 30, 70, 100]; %perform also: 10, 30, 70 for euclidean
 %populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
-% FIRST (metricVector = ["manhattan"];)
-%maxGenerationsVector = [100];
-%populationSizeVector = [60, 100, 300, 500];
 % SECOND (metricVector = ["euclidean"];)
 %maxGenerationsVector = [10, 30, 70];
-%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+%populationSizeVector = [10, 20, 60, 100, 300, 500];
 metricVector = ["manhattan", "euclidean"];
 %metricVector = ["euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
@@ -89,13 +88,22 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
+%initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
+%'SelectionFcn', 'selectiontournament' | 'selectionroulette'
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
             allProperlyRecognizedLettersCount = 0;
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-            optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
+            optimizationOptions = optimoptions( ...
+                'ga', ...
+                'Display', 'off', ...
+                'MaxGenerations', maxGenerations, ...
+                'PopulationSize', populationSize, ...
+                'UseParallel', true, ...
+                'UseVectorized', false ...
+            );
             % start the timer
             tStart = tic;
             % run the ga algorithm for every letter and every person
