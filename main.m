@@ -68,10 +68,10 @@ recognizedLetters = string(zeros(letterNum,personsNum));
 letterRecognitionAccuracy = zeros(letterNum,1);
 allProperlyRecognizedLettersCount = 0;
 % options for ga algorithm
-lb = [-320; -240; -180; 0.75; 0.75];
-ub = [320; 240; 180; 1.25; 1.25];
-%lb = [-80; -50; -90; 0.65; 0.65];
-%ub = [80; 50; 90; 1.35; 1.35];
+%lb = [-320; -240; -180; 0.75; 0.75];
+%ub = [320; 240; 180; 1.25; 1.25];
+lb = [-160; -170; -90; 0.75; 0.75];
+ub = [160; 170; 90; 1.25; 1.25];
 maxGenerations = 10;
 populationSize = 100;
 metric = "manhattan";
@@ -81,9 +81,21 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
+% additional ga options
+initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
+%'SelectionFcn', 'selectiontournament' | 'selectionroulette'
 % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-optimizationOptions = optimoptions('ga', 'Display', 'off', 'MaxGenerations', maxGenerations, 'PopulationSize', populationSize, 'UseParallel', true, 'UseVectorized', false);
-% run the ga algorithm for every letter and every person
+optimizationOptions = optimoptions( ...
+    'ga', ...
+    'Display', 'off', ...
+    'MaxGenerations', maxGenerations, ...
+    'PopulationSize', populationSize, ...
+    'UseParallel', true, ...
+    'UseVectorized', false, ...
+    'InitialPopulationMatrix', initPopMtx, ...
+    'SelectionFcn', 'selectionroulette' ...
+);
+% run the ga algorithm for every letter and every person (with specified metric)
 fitnessFunHandle = metricMap(metric);
 % start the timer
 tStart = tic;
@@ -122,7 +134,7 @@ wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
 %% prepare folder for saving results
 disp("Saving results to files");
 % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-isArchiveDir = true;
+isArchiveDir = false;
 description =   "gen="+maxGenerations+...
                 "_pop="+populationSize+...
                 "_metric="+metric;
