@@ -70,12 +70,19 @@ letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
-maxGenerationsVector = [70, 100, 120]; %perform also: 10, 30 for euclidean
-populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
-%metricVector = ["manhattan", "euclidean"];
-%maxGenerationsVector = [30];
-%populationSizeVector = [500, 1000];
-metricVector = ["manhattan"];
+maxGenerationsVector = [100]; %perform also: 10, 30, 70 for euclidean
+populationSizeVector = [60, 100, 300, 500];
+% INITIAL
+%maxGenerationsVector = [10, 30, 70, 100]; %perform also: 10, 30, 70 for euclidean
+%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+% FIRST (metricVector = ["manhattan"];)
+%maxGenerationsVector = [100];
+%populationSizeVector = [60, 100, 300, 500];
+% SECOND (metricVector = ["euclidean"];)
+%maxGenerationsVector = [10, 30, 70];
+%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+metricVector = ["manhattan", "euclidean"];
+%metricVector = ["euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
