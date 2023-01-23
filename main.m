@@ -72,16 +72,14 @@ lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 %lb = [-160; -170; -90; 0.75; 0.75];
 %ub = [160; 170; 90; 1.25; 1.25];
-maxGenerationsVector = [100]; %perform also: 10, 30, 70 for euclidean
-populationSizeVector = [60, 100, 300, 500];
 % INITIAL
-%maxGenerationsVector = [10, 30, 70, 100]; %perform also: 10, 30, 70 for euclidean
-%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+maxGenerationsVector = [10, 30, 70, 100];
+populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
 % SECOND (metricVector = ["euclidean"];)
-%maxGenerationsVector = [10, 30, 70];
-%populationSizeVector = [10, 20, 60, 100, 300, 500];
+%if ((maxGenerations == 70 && (populationSize == 10 || populationSize == 20 || populationSize == 60 || populationSize == 100 || populationSize == 300 || populationSize == 1000)) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000)))
+%  continue;
+%end
 metricVector = ["manhattan", "euclidean"];
-%metricVector = ["euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
