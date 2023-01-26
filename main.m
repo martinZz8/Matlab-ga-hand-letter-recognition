@@ -68,10 +68,10 @@ isArchiveDir = true;
 recognizedLetters = string(zeros(letterNum,personsNum));
 letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
-lb = [-320; -240; -180; 0.75; 0.75];
-ub = [320; 240; 180; 1.25; 1.25];
-%lb = [-160; -170; -90; 0.75; 0.75];
-%ub = [160; 170; 90; 1.25; 1.25];
+%lb = [-320; -240; -180; 0.75; 0.75];
+%ub = [320; 240; 180; 1.25; 1.25];
+lb = [-160; -170; -90; 0.75; 0.75];
+ub = [160; 170; 90; 1.25; 1.25];
 % INITIAL
 maxGenerationsVector = [10, 30, 70, 100];
 populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
@@ -86,12 +86,13 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
-%initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
+initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
 %'SelectionFcn', 'selectiontournament' | 'selectionroulette'
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
+            disp("---- START of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
             allProperlyRecognizedLettersCount = 0;
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
             optimizationOptions = optimoptions( ...
@@ -100,7 +101,9 @@ for metric=metricVector
                 'MaxGenerations', maxGenerations, ...
                 'PopulationSize', populationSize, ...
                 'UseParallel', true, ...
-                'UseVectorized', false ...
+                'UseVectorized', false, ...
+                'InitialPopulationMatrix', initPopMtx, ...
+                'SelectionFcn', 'selectiontournament' ...
             );
             % start the timer
             tStart = tic;
@@ -138,13 +141,13 @@ for metric=metricVector
             %disp("letter acc:"+letterRecognitionAccuracy);
             %disp("whole acc: "+wholeAccuracy);
             %% prepare folder for saving results
-            disp("Saving results to files");
+            disp("Saving results to files ...");
             % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
             description =   "gen="+maxGenerations+...
                             "_pop="+populationSize+...
                             "_metric="+metric;
             folderName = description;
-            parentFolderName = "archive";
+            parentFolderName = "archive/2_ga_tests"; %initial val: archive
             if isArchiveDir
                 mkdir(parentFolderName, folderName);
             end
@@ -160,8 +163,8 @@ for metric=metricVector
             fileName = "confusionMatrix.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
             saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
-            disp("---- End of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
+            disp("---- END of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
         end
     end 
 end
-disp("**---- End of script ----**");
+disp("**---- END OF SCRIPT ----**");
