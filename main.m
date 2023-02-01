@@ -70,13 +70,11 @@ letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
 %lb = [-320; -240; -180; 0.75; 0.75];
 %ub = [320; 240; 180; 1.25; 1.25];
-lb = [-160; -170; -90; 0.75; 0.75];
-ub = [160; 170; 90; 1.25; 1.25];
+lb = [-160; -120; -90; 0.75; 0.75];
+ub = [160; 120; 90; 1.25; 1.25];
 % INITIAL
-%maxGenerationsVector = [10, 30, 70, 100];
-%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
-maxGenerationsVector = [30];
-populationSizeVector = [20];
+maxGenerationsVector = [10, 30, 70, 100];
+populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
 % SECOND (metricVector = ["euclidean"];)
 %if (maxGenerations == 70 && (populationSize == 10 || populationSize == 1000)) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000))
 %    continue;
