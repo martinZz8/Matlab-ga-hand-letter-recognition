@@ -73,8 +73,10 @@ letterRecognitionAccuracy = zeros(letterNum,1);
 lb = [-160; -170; -90; 0.75; 0.75];
 ub = [160; 170; 90; 1.25; 1.25];
 % INITIAL
-maxGenerationsVector = [10, 30, 70, 100];
-populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+%maxGenerationsVector = [10, 30, 70, 100];
+%populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
+maxGenerationsVector = [30];
+populationSizeVector = [20];
 % SECOND (metricVector = ["euclidean"];)
 %if (maxGenerations == 70 && (populationSize == 10 || populationSize == 1000)) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000))
 %    continue;
@@ -112,14 +114,10 @@ for metric=metricVector
                 disp("Letter: "+templateNames{i});
                 properlyRecognizedLettersCount = 0;
                 for j=1:personsNum
-                    % OLD
-                    %fitnessFunLambda = @(X) fitnessFun1(X, unknownClouds{i,j}, templateClouds);
-                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);%OLD - fitnessFun1
                     rng default;
                     [Xmin, Jmin] = ga(fitnessFunLambda, length(lb), [], [], [], [], lb, ub, [], [], optimizationOptions);
-                    % OLD
-                    %[~, ~, winingTemplateIndex] = fitnessFun1(Xmin, unknownClouds{i,j}, templateClouds);
-                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds); %OLD - fitnessFun1
                     recognizedClass = templateNames{winingTemplateIndex, 1};
                     recognizedLetters(i,j) = recognizedClass;
                     if recognizedClass == templateNames{i}

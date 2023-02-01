@@ -1,9 +1,8 @@
 % Uses euclidean function to establish dimension between two points (euclidean metric)
-function [J, transformedCloud, winningTemplateIndex] = fitnessFun2(X, unknownCloud, templateClouds)
+function [J, transformedCloud, winningTemplateIndex] = fitnessFun2OLD(X, unknownCloud, templateClouds)
 [transformedCloud] = fitnessFunBase(X, unknownCloud);
 
-% exclude last point in last index (duplicated point on smallest finger)
-templatesCount = numel(templateClouds) - 1;
+templatesCount = numel(templateClouds);
 Js = zeros(templatesCount, 1);
 for templateIndex=1:templatesCount
     diffsCloud = abs(templateClouds{templateIndex}.Location - transformedCloud.Location);
