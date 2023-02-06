@@ -68,15 +68,15 @@ isArchiveDir = true;
 recognizedLetters = string(zeros(letterNum,personsNum));
 letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
-%lb = [-320; -240; -180; 0.75; 0.75];
-%ub = [320; 240; 180; 1.25; 1.25];
-lb = [-160; -120; -90; 0.75; 0.75];
-ub = [160; 120; 90; 1.25; 1.25];
+lb = [-320; -240; -180; 0.75; 0.75];
+ub = [320; 240; 180; 1.25; 1.25];
+% lb = [-160; -120; -90; 0.75; 0.75];
+% ub = [160; 120; 90; 1.25; 1.25];
 % INITIAL
 maxGenerationsVector = [10, 30, 70, 100];
 populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
-% SECOND (metricVector = ["euclidean"];)
-%if (maxGenerations == 70 && (populationSize == 10 || populationSize == 1000)) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000))
+% BYPASS COND
+%if (maxGenerations == 70 && populationSize == 1000) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000))
 %    continue;
 %end
 metricVector = ["manhattan", "euclidean"];
@@ -86,12 +86,13 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
-initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
+%initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
 %'SelectionFcn', 'selectiontournament' | 'selectionroulette'
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
+            % BYPASS COND - GOES HERE
             disp("---- START of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
             allProperlyRecognizedLettersCount = 0;
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
@@ -101,9 +102,7 @@ for metric=metricVector
                 'MaxGenerations', maxGenerations, ...
                 'PopulationSize', populationSize, ...
                 'UseParallel', true, ...
-                'UseVectorized', false, ...
-                'InitialPopulationMatrix', initPopMtx, ...
-                'SelectionFcn', 'selectiontournament' ...
+                'UseVectorized', false ...
             );
             % start the timer
             tStart = tic;
@@ -143,7 +142,7 @@ for metric=metricVector
                             "_pop="+populationSize+...
                             "_metric="+metric;
             folderName = description;
-            parentFolderName = "archive/2_ga_tests"; %initial val: archive
+            parentFolderName = "archive/1_ga_tests"; %initial val: archive
             if isArchiveDir
                 mkdir(parentFolderName, folderName);
             end
