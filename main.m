@@ -142,7 +142,7 @@ for metric=metricVector
                             "_pop="+populationSize+...
                             "_metric="+metric;
             folderName = description;
-            parentFolderName = "archive/ga/1_ga_tests"; %initial val: archive
+            parentFolderName = "archive/ga/1"; %initial val: archive
             if isArchiveDir
                 mkdir(parentFolderName, folderName);
             end
