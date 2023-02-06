@@ -67,18 +67,16 @@ isArchiveDir = true;
 [letterNum, personsNum] = size(unknownClouds);
 recognizedLetters = string(zeros(letterNum,personsNum));
 letterRecognitionAccuracy = zeros(letterNum,1);
-% options for ga algorithm
+% options for pt-ds algorithm
+x0 = [0, 0, 0, 1, 1];
 lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 % lb = [-160; -120; -90; 0.75; 0.75];
 % ub = [160; 120; 90; 1.25; 1.25];
-% INITIAL
-maxGenerationsVector = [10, 30, 70, 100];
-populationSizeVector = [10, 20, 60, 100, 300, 500, 1000];
-% BYPASS COND
-%if (maxGenerations == 70 && populationSize == 1000) || (maxGenerations == 100 && (populationSize == 500 || populationSize == 1000))
-%    continue;
-%end
+maxFunctionEvaluationsVector = [200, 500, 1000, 2000, 2500];
+maxIterationsVector = [10, 30, 50, 80, 100, 120];
+pollMethodVector = ["GPSPositiveBasis2N", "GPSPositiveBasisNp1", "MADSPositiveBasis2N", "MADSPositiveBasisNp1", "OrthoMADSPositiveBasis2N", "OrthoMADSPositiveBasisNp1"];
+pollOrderAlgorithmVector = ["Consecutive", "Random", "Success"];
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 valueFuncSet = {
@@ -86,79 +84,88 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
-%initPopMtx = [0, 0, 0, 1, 1]; %'InitialPopulationMatrix', initPopMtx
-%'SelectionFcn', 'selectiontournament' | 'selectionroulette'
+% BYPASS COND
+%N/A
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
-    for maxGenerations=maxGenerationsVector
-        for populationSize=populationSizeVector
-            % BYPASS COND - GOES HERE
-            disp("---- START of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
-            allProperlyRecognizedLettersCount = 0;
-            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
-            optimizationOptions = optimoptions( ...
-                'ga', ...
-                'Display', 'off', ...
-                'MaxGenerations', maxGenerations, ...
-                'PopulationSize', populationSize, ...
-                'UseParallel', true, ...
-                'UseVectorized', false ...
-            );
-            % start the timer
-            tStart = tic;
-            % run the ga algorithm for every letter and every person
-            for i=1:letterNum
-                disp("Letter: "+templateNames{i});
-                properlyRecognizedLettersCount = 0;
-                for j=1:personsNum
-                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);%OLD - fitnessFun1
-                    rng default;
-                    [Xmin, Jmin] = ga(fitnessFunLambda, length(lb), [], [], [], [], lb, ub, [], [], optimizationOptions);
-                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds); %OLD - fitnessFun1
-                    recognizedClass = templateNames{winingTemplateIndex, 1};
-                    recognizedLetters(i,j) = recognizedClass;
-                    if recognizedClass == templateNames{i}
-                        properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+    for maxFunEvals=maxFunctionEvaluationsVector
+        for maxInterations=maxIterationsVector
+            for pollMethod=pollMethodVector
+                for pollOrderAlgorithm=pollOrderAlgorithmVector
+                    % BYPASS COND - GOES HERE
+                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
+                    allProperlyRecognizedLettersCount = 0;
+                    % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
+                    optimizationOptions = optimoptions( ...
+                        'patternsearch', ...
+                        'Display', 'off', ...
+                        'Algorithm', "classic", ...
+                        'PollMethod', pollMethod, ...
+                        'PollOrderAlgorithm', pollOrderAlgorithm, ...
+                        'MaxFunctionEvaluations', maxFunEvals, ...
+                        'MaxIterations', maxInterations, ...
+                        'UseParallel', true, ...
+                        'UseVectorized', false ...
+                    );
+                    % start the timer
+                    tStart = tic;
+                    % run the patternsearch algorithm for every letter and every person
+                    for i=1:letterNum
+                        disp("Letter: "+templateNames{i});
+                        properlyRecognizedLettersCount = 0;
+                        for j=1:personsNum
+                            fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                            rng default;
+                            [Xmin, Jmin] = patternsearch(fitnessFunLambda, x0, [], [], [], [], lb, ub, [], optimizationOptions);
+                            [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                            recognizedClass = templateNames{winingTemplateIndex, 1};
+                            recognizedLetters(i,j) = recognizedClass;
+                            if recognizedClass == templateNames{i}
+                                properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                            end
+                            %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                        end
+                        letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
+                        allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
                     end
-                    %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                    %% stop the timer and print time results
+                    tEnd = toc(tStart);
+                    tEndMin = floor(tEnd / 60);
+                    tEndSec = floor(mod(tEnd, 60));
+                    elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
+                    disp(elapsedTimeStr);
+                    %% count the whole accuracy
+                    wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
+                    %disp("letter acc:"+letterRecognitionAccuracy);
+                    %disp("whole acc: "+wholeAccuracy);
+                    %% prepare folder for saving results
+                    disp("Saving results to files ...");
+                    % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
+                    description =   "funEvals="+maxFunEvals+...
+                                    "_maxIters="+maxInterations+...
+                                    "_poolMet="+pollMethod+...
+                                    "_poolOrdAl="+pollOrderAlgorithm+...
+                                    "_metric="+metric;
+                    folderName = description;
+                    parentFolderName = "archive/pattern_search/1_patternsearch_tests"; %initial val: archive
+                    if isArchiveDir
+                        mkdir(parentFolderName, folderName);
+                    end
+                    %% save results to .xlsx file
+                    currentFolderName = "";
+                    if isArchiveDir
+                        currentFolderName = parentFolderName+"/"+folderName;
+                    end
+                    fileName = "results.xlsx"; %delete(fileName);
+                    fileNameToSave = getProperFileName(fileName, currentFolderName);
+                    saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
+                    %% save confusion matrix to .xlsx file
+                    fileName = "confusionMatrix.xlsx"; %delete(fileName);
+                    fileNameToSave = getProperFileName(fileName, currentFolderName);
+                    saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
+                    disp("---- END of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
                 end
-                letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
-                allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
             end
-            %% stop the timer and print time results
-            tEnd = toc(tStart);
-            tEndMin = floor(tEnd / 60);
-            tEndSec = floor(mod(tEnd, 60));
-            elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
-            disp(elapsedTimeStr);
-            %% count the whole accuracy
-            wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
-            %disp("letter acc:"+letterRecognitionAccuracy);
-            %disp("whole acc: "+wholeAccuracy);
-            %% prepare folder for saving results
-            disp("Saving results to files ...");
-            % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-            description =   "gen="+maxGenerations+...
-                            "_pop="+populationSize+...
-                            "_metric="+metric;
-            folderName = description;
-            parentFolderName = "archive/1_ga_tests"; %initial val: archive
-            if isArchiveDir
-                mkdir(parentFolderName, folderName);
-            end
-            %% save results to .xlsx file
-            currentFolderName = "";
-            if isArchiveDir
-                currentFolderName = parentFolderName+"/"+folderName;
-            end
-            fileName = "results.xlsx"; %delete(fileName);
-            fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
-            %% save confusion matrix to .xlsx file
-            fileName = "confusionMatrix.xlsx"; %delete(fileName);
-            fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
-            disp("---- END of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
         end
     end 
 end
