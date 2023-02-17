@@ -79,8 +79,8 @@ pollMethodVector = ["GPSPositiveBasis2N", "GPSPositiveBasisNp1", "MADSPositiveBa
 pollOrderAlgorithmVector = ["Consecutive", "Random", "Success"]; %works only with GPS and GSS pollMethod
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
-%MeshExpansionFactor (double number)
-%MeshContractionFactor (double number)
+%MeshExpansionFactor (double)
+%MeshContractionFactor (double)
 %AccelerateMesh (true, false)
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
