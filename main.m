@@ -76,9 +76,12 @@ ub = [320; 240; 180; 1.25; 1.25];
 maxFunctionEvaluationsVector = [200, 500, 1000, 2000, 2500];
 maxIterationsVector = [10, 30, 50, 80, 100, 120];
 pollMethodVector = ["GPSPositiveBasis2N", "GPSPositiveBasisNp1", "MADSPositiveBasis2N", "MADSPositiveBasisNp1", "OrthoMADSPositiveBasis2N", "OrthoMADSPositiveBasisNp1"];
-pollOrderAlgorithmVector = ["Consecutive", "Random", "Success"];
+pollOrderAlgorithmVector = ["Consecutive", "Random", "Success"]; %works only with GPS and GSS pollMethod
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
+%MeshExpansionFactor (double number)
+%MeshContractionFactor (double number)
+%AccelerateMesh (true, false)
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
     @(X, uc, tc) fitnessFun2(X, uc, tc);
@@ -91,22 +94,31 @@ for metric=metricVector
     for maxFunEvals=maxFunctionEvaluationsVector
         for maxInterations=maxIterationsVector
             for pollMethod=pollMethodVector
+                pollOrderAlgorithmCounter = 0;
                 for pollOrderAlgorithm=pollOrderAlgorithmVector
                     % BYPASS COND - GOES HERE
                     disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
                     allProperlyRecognizedLettersCount = 0;
-                    % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
+                    % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
                     optimizationOptions = optimoptions( ...
                         'patternsearch', ...
                         'Display', 'off', ...
                         'Algorithm', "classic", ...
                         'PollMethod', pollMethod, ...
-                        'PollOrderAlgorithm', pollOrderAlgorithm, ...
                         'MaxFunctionEvaluations', maxFunEvals, ...
                         'MaxIterations', maxInterations, ...
                         'UseParallel', true, ...
                         'UseVectorized', false ...
                     );
+                    % Check if pollMethod is 'GPS'. If so, set the 'PollOrderAlgorithm' option. Otherwise perform 'patternsearch' only once for vector 'pollOrderAlgorithmVector'.
+                    if contains(pollMethod, "GPS")
+                       optimizationOptions =  optimoptions(optimizationOptions, 'PollOrderAlgorithm', pollOrderAlgorithm);
+                    else
+                        if pollOrderAlgorithmCounter > 0
+                            break;
+                        end
+                    end
+                    pollOrderAlgorithmCounter = pollOrderAlgorithmCounter + 1;
                     % start the timer
                     tStart = tic;
                     % run the patternsearch algorithm for every letter and every person
