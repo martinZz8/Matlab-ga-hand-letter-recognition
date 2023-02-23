@@ -86,6 +86,21 @@ for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for minSurrPoints=minSurrogatePointsVector
         for maxFunEvals=maxFunctionEvaluationsVector
+            % BYPASS COND
+            % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
+            % Prepare parent folder name and inner folder name
+            parentFolderName = "archive/surrogate/1"; %initial val: archive
+            innerFolderName =   "minSurrPoints="+minSurrPoints+...
+                                "_maxFunEvals="+maxFunEvals+...
+                                "_metric="+metric;
+            % NOTE: comment this condition if you want to redo the computations
+            if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+               continue;
+            end
+            % START OF SPECIFIC SCRIPT
+            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
+            disp("---- START of minSurrPoints=" + minSurrPoints + ";maxFunEvals=" + maxFunEvals + ";metric=" + metric + " script ----");
+            allProperlyRecognizedLettersCount = 0;
             % Prepare 'optimizationOptions' structure
             optimizationOptions = optimoptions( ...
                 'surrogateopt', ...
@@ -96,22 +111,6 @@ for metric=metricVector
                 'UseParallel', true, ...
                 'UseVectorized', false ...
             );
-            % BYPASS COND
-            % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
-            % Prepare parent folder name and inner folder name
-            parentFolderName = "archive/surrogate/1"; %initial val: archive
-            innerFolderName =   "minSurrPoints="+minSurrPoints+...
-                                "_maxFunEvals="+maxFunEvals+...
-                                "_metric="+metric;
-            % (this condition can be commented when you want to redo the computations)
-            if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
-               continue;
-            end
-            % START OF SPECIFIC SCRIPT
-            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
-            disp("---- START of minSurrPoints=" + minSurrPoints + ";maxFunEvals=" + maxFunEvals + ";metric=" + metric + " script ----");
-            allProperlyRecognizedLettersCount = 0;
-            
             % start the timer
             tStart = tic;
             % run the patternsearch algorithm for every letter and every person
