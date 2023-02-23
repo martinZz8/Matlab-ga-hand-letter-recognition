@@ -87,8 +87,6 @@ valueFuncSet = {
     @(X, uc, tc) fitnessFun2(X, uc, tc);
 };
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
-% BYPASS COND
-%N/A
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxFunEvals=maxFunctionEvaluationsVector
@@ -96,10 +94,7 @@ for metric=metricVector
             for pollMethod=pollMethodVector
                 pollOrderAlgorithmCounter = 0;
                 for pollOrderAlgorithm=pollOrderAlgorithmVector
-                    % BYPASS COND - GOES HERE
-                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
-                    allProperlyRecognizedLettersCount = 0;
-                    % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
+                    % Prepare 'optimizationOptions' structure
                     optimizationOptions = optimoptions( ...
                         'patternsearch', ...
                         'Display', 'off', ...
@@ -110,7 +105,8 @@ for metric=metricVector
                         'UseParallel', true, ...
                         'UseVectorized', false ...
                     );
-                    % Check if pollMethod is 'GPS'. If so, set the 'PollOrderAlgorithm' option. Otherwise perform 'patternsearch' only once for vector 'pollOrderAlgorithmVector'.
+                    % 1ST BYPASS COND
+                    % ... Check if pollMethod is 'GPS'. If so, set the 'PollOrderAlgorithm' option. Otherwise perform 'patternsearch' only once for vector 'pollOrderAlgorithmVector'.
                     if contains(pollMethod, "GPS")
                        optimizationOptions =  optimoptions(optimizationOptions, 'PollOrderAlgorithm', pollOrderAlgorithm);
                     else
@@ -119,6 +115,23 @@ for metric=metricVector
                         end
                     end
                     pollOrderAlgorithmCounter = pollOrderAlgorithmCounter + 1;
+                    % 2ND BYPASS COND
+                    % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
+                    % Prepare parent folder name and inner folder name
+                    parentFolderName = "archive/pattern_search/1"; %initial val: archive
+                    innerFolderName =   "funEv="+maxFunEvals+...
+                                        "_maxIt="+maxInterations+...
+                                        "_plM="+pollMethod+...
+                                        "_plOA="+pollOrderAlgorithm+...
+                                        "_metric="+metric;
+                    % (this condition can be commented when you want to redo the computations)
+                    if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+                       continue;
+                    end
+                    % START OF SPECIFIC SCRIPT
+                    % ... NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
+                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
+                    allProperlyRecognizedLettersCount = 0;
                     % start the timer
                     tStart = tic;
                     % run the patternsearch algorithm for every letter and every person
@@ -153,20 +166,14 @@ for metric=metricVector
                     %% prepare folder for saving results
                     disp("Saving results to files ...");
                     % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-                    description =   "funEv="+maxFunEvals+...
-                                    "_maxIt="+maxInterations+...
-                                    "_plM="+pollMethod+...
-                                    "_plOA="+pollOrderAlgorithm+...
-                                    "_metric="+metric;
-                    folderName = description;
-                    parentFolderName = "archive/pattern_search/1"; %initial val: archive
+                    description = innerFolderName;
                     if isArchiveDir
-                        mkdir(parentFolderName, folderName);
+                        mkdir(parentFolderName, innerFolderName);
                     end
                     %% save results to .xlsx file
                     currentFolderName = "";
                     if isArchiveDir
-                        currentFolderName = parentFolderName+"/"+folderName;
+                        currentFolderName = parentFolderName+"/"+innerFolderName;
                     end
                     fileName = "results.xlsx"; %delete(fileName);
                     fileNameToSave = getProperFileName(fileName, currentFolderName);
@@ -175,6 +182,7 @@ for metric=metricVector
                     fileName = "confusionMatrix.xlsx"; %delete(fileName);
                     fileNameToSave = getProperFileName(fileName, currentFolderName);
                     saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
+                    % END OF SPECIFIC SCRIPT
                     disp("---- END of maxFunEvals=" + maxFunEvals + ";maxIterations=" + maxInterations + ";poolMethod=" + pollMethod + ";poolOrderAlgorithm=" + pollOrderAlgorithm + ";metric=" + metric + " script ----");
                 end
             end
