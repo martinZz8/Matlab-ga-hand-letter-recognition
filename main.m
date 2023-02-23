@@ -92,10 +92,27 @@ for metric=metricVector
     fitnessFunHandle = metricMap(metric);
     for maxGenerations=maxGenerationsVector
         for populationSize=populationSizeVector
-            % BYPASS COND - GOES HERE
+            % 1ST BYPASS COND
+            % ... bypass specific combidations of maxGenerations and populationSize
+            if ((maxGenerations == 70 && populationSize == 1000) || (maxGenerations == 100 && populationSize >= 500))
+                continue;
+            end
+            % 2ND BYPASS COND
+            % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
+            % Prepare parent folder name and inner folder name
+            parentFolderName = "archive/ga/1"; %initial val: archive
+            innerFolderName =   "gen="+maxGenerations+...
+                                "_pop="+populationSize+...
+                                "_metric="+metric;
+            % NOTE: comment this condition if you want to redo the computations
+            if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+               continue;
+            end
+            % START OF SPECIFIC SCRIPT
+            % ... NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
             disp("---- START of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
             allProperlyRecognizedLettersCount = 0;
-            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
+            % Prepare 'optimizationOptions' structure
             optimizationOptions = optimoptions( ...
                 'ga', ...
                 'Display', 'off', ...
@@ -138,18 +155,14 @@ for metric=metricVector
             %% prepare folder for saving results
             disp("Saving results to files ...");
             % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-            description =   "gen="+maxGenerations+...
-                            "_pop="+populationSize+...
-                            "_metric="+metric;
-            folderName = description;
-            parentFolderName = "archive/ga/1"; %initial val: archive
+            description = innerFolderName;
             if isArchiveDir
-                mkdir(parentFolderName, folderName);
+                mkdir(parentFolderName, innerFolderName);
             end
             %% save results to .xlsx file
             currentFolderName = "";
             if isArchiveDir
-                currentFolderName = parentFolderName+"/"+folderName;
+                currentFolderName = parentFolderName+"/"+innerFolderName;
             end
             fileName = "results.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
@@ -158,6 +171,7 @@ for metric=metricVector
             fileName = "confusionMatrix.xlsx"; %delete(fileName);
             fileNameToSave = getProperFileName(fileName, currentFolderName);
             saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
+            % END OF SPECIFIC SCRIPT
             disp("---- END of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
         end
     end 
