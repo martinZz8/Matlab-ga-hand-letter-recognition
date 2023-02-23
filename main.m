@@ -105,7 +105,7 @@ for metric=metricVector
                         'UseParallel', true, ...
                         'UseVectorized', false ...
                     );
-                    % 1ST BYPASS COND
+                    % 1ST BYPASS COND (optional with adjusting 'optimizationOptions' structure)
                     % ... Check if pollMethod is 'GPS'. If so, set the 'PollOrderAlgorithm' option. Otherwise perform 'patternsearch' only once for vector 'pollOrderAlgorithmVector'.
                     if contains(pollMethod, "GPS")
                        optimizationOptions =  optimoptions(optimizationOptions, 'PollOrderAlgorithm', pollOrderAlgorithm);
@@ -124,7 +124,7 @@ for metric=metricVector
                                         "_plM="+pollMethod+...
                                         "_plOA="+pollOrderAlgorithm+...
                                         "_metric="+metric;
-                    % (this condition can be commented when you want to redo the computations)
+                    % NOTE: comment this condition if you want to redo the computations
                     if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
                        continue;
                     end
