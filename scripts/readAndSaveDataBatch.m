@@ -60,8 +60,8 @@ function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave)
         end
     end
     % Save the data to specific matrix
-    disp("Result to save:");
-    disp(resultData);
+    %disp("Result to save:");
+    %disp(resultData);
     saveDataFunc(resultData);
     disp("Done");
 end
