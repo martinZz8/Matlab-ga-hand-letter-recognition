@@ -109,7 +109,7 @@ for metric=metricVector
                         
                         % START OF SPECIFIC SCRIPT
                         % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
-                        disp("---- START of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";metric=" + metric + " script ----");
+                        disp("---- START of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";minNgFrac=" + minNeighborsFraction + ";sfAdjWg=" + selfAdjustmentWeight + ";soAdjWg=" + socialAdjustmentWeight + ";metric=" + metric + " script ----");
                         allProperlyRecognizedLettersCount = 0;
                         % Prepare 'optimizationOptions' structure
                         optimizationOptions = optimoptions( ...
@@ -174,7 +174,7 @@ for metric=metricVector
                         fileNameToSave = getProperFileName(fileName, currentFolderName);
                         saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
                         % END OF SPECIFIC SCRIPT
-                        disp("---- END of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";metric=" + metric + " script ----");
+                        disp("---- END of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";minNgFrac=" + minNeighborsFraction + ";sfAdjWg=" + selfAdjustmentWeight + ";soAdjWg=" + socialAdjustmentWeight + ";metric=" + metric + " script ----");
                     end
                 end
             end
