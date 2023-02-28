@@ -1,13 +1,13 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(minNeighborsFraction, selfAdjustmentWeight, socialAdjustmentWeight, metric, isEffectiveness, locationToSave)
 	% Data
-	searchInDirName_ = "archive/surrogate/1";
+	searchInDirName_ = "archive/particle_swarm/1";
 	innerFileName_ = "results_1.xlsx";
-	rowItemName = "maxFunEvals";
-	columnItemName = "minSurrPoints";
-	rowItemsVector = [60, 100, 150, 250, 350];
-	columnItemsVector = [10, 20, 40, 60, 80, 100, 120];
-	containsFunc = @(X) contains(X, "metric="+metric);
+	rowItemName = "swarmSize";
+	columnItemName = "maxIters";
+	rowItemsVector = [10, 20, 40, 50, 60, 80, 100, 120];
+	columnItemsVector = [50, 100, 200, 400, 600, 800, 1000];
+	containsFunc = @(X) (contains(X, "minNgFrac="+minNeighborsFraction) && contains(X, "sfAdjWg="+selfAdjustmentWeight) && contains(X, "soAdjWg="+socialAdjustmentWeight) && contains(X, "metric="+metric));
 	function [dt] = readEffectiveness(filePath)
 		dt = readmatrix(filePath, 'Range', 'L18:L18', 'OutputType','double');
     end

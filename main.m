@@ -72,11 +72,14 @@ lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 % lb = [-160; -120; -90; 0.75; 0.75];
 % ub = [160; 120; 90; 1.25; 1.25];
-minSurrogatePointsVector = [10, 20, 40, 60, 80, 100, 120];
-maxFunctionEvaluationsVector = [60, 100, 150, 250, 350];
+swarmSizeVector = [10, 20, 40, 50, 60, 80, 100, 120];
+maxIterationsVector = [50, 100, 200, 400, 600, 800, 1000];
+minNeighborsFractionVector = [0.25, 0.4];
+selfAdjustmentWeightVector = [1.49, 1.6];
+socialAdjustmentWeightVector = [1.49, 1.6];
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
-%initPointsMtx = [0, 0, 0, 1, 1]; %'InitialPoints', initPointsMtx
+%initSwarmMtx = [0, 0, 0, 1, 1]; %'InitialSwarmMatrix', initSwarmMtx
 valueFuncSet = {
     @(X, uc, tc) fitnessFun1(X, uc, tc);
     @(X, uc, tc) fitnessFun2(X, uc, tc);
@@ -84,85 +87,97 @@ valueFuncSet = {
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
-    for minSurrPoints=minSurrogatePointsVector
-        for maxFunEvals=maxFunctionEvaluationsVector
-            % BYPASS COND
-            % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
-            % Prepare parent folder name and inner folder name
-            parentFolderName = "archive/surrogate/1"; %initial val: archive
-            innerFolderName =   "minSurrPoints="+minSurrPoints+...
-                                "_maxFunEvals="+maxFunEvals+...
-                                "_metric="+metric;
-            % NOTE: comment this condition if you want to redo the computations
-            if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
-               continue;
-            end
-            % START OF SPECIFIC SCRIPT
-            % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
-            disp("---- START of minSurrPoints=" + minSurrPoints + ";maxFunEvals=" + maxFunEvals + ";metric=" + metric + " script ----");
-            allProperlyRecognizedLettersCount = 0;
-            % Prepare 'optimizationOptions' structure
-            optimizationOptions = optimoptions( ...
-                'surrogateopt', ...
-                'Display', 'off', ...
-                'PlotFcn', @plotfcn, ...
-                'MinSurrogatePoints', minSurrPoints, ...
-                'MaxFunctionEvaluations', maxFunEvals, ...
-                'UseParallel', true, ...
-                'UseVectorized', false ...
-            );
-            % start the timer
-            tStart = tic;
-            % run the patternsearch algorithm for every letter and every person
-            for i=1:letterNum
-                disp("Letter: "+templateNames{i});
-                properlyRecognizedLettersCount = 0;
-                for j=1:personsNum
-                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
-                    rng default;
-                    [Xmin, Jmin] = surrogateopt(fitnessFunLambda, lb, ub, [], [], [], [], [], optimizationOptions);
-                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
-                    recognizedClass = templateNames{winingTemplateIndex, 1};
-                    recognizedLetters(i,j) = recognizedClass;
-                    if recognizedClass == templateNames{i}
-                        properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+    for swarmSize=swarmSizeVector
+        for maxIterations=maxIterationsVector
+            for minNeighborsFraction=minNeighborsFractionVector
+                for selfAdjustmentWeight=selfAdjustmentWeightVector
+                    for socialAdjustmentWeight=socialAdjustmentWeightVector
+                        % BYPASS COND
+                        % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
+                        % Prepare parent folder name and inner folder name
+                        parentFolderName = "archive/particle_swarm/1"; %initial val: archive
+                        innerFolderName =   "swarmSize="+swarmSize+...
+                                            "_maxIters="+maxIterations+...
+                                            "_minNgFrac="+minNeighborsFraction+...
+                                            "_sfAdjWg="+selfAdjustmentWeight+...
+                                            "_soAdjWg="+socialAdjustmentWeight+...
+                                            "_metric="+metric;
+                        % NOTE: comment this condition if you want to redo the computations
+                        if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+                           continue;
+                        end
+                        
+                        % START OF SPECIFIC SCRIPT
+                        % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
+                        disp("---- START of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";metric=" + metric + " script ----");
+                        allProperlyRecognizedLettersCount = 0;
+                        % Prepare 'optimizationOptions' structure
+                        optimizationOptions = optimoptions( ...
+                            'particleswarm', ...
+                            'Display', 'off', ...
+                            'SwarmSize', swarmSize, ...
+                            'MaxIterations', maxIterations, ...
+                            'MinNeighborsFraction', minNeighborsFraction, ...
+                            'SelfAdjustmentWeight', selfAdjustmentWeight, ...
+                            'SocialAdjustmentWeight', socialAdjustmentWeight, ...
+                            'UseParallel', true, ...
+                            'UseVectorized', false ...
+                        );
+                        % start the timer
+                        tStart = tic;
+                        % run the patternsearch algorithm for every letter and every person
+                        for i=1:letterNum
+                            disp("Letter: "+templateNames{i});
+                            properlyRecognizedLettersCount = 0;
+                            for j=1:personsNum
+                                fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                                rng default;
+                                [Xmin, Jmin] = particleswarm(fitnessFunLambda, length(lb), lb, ub, optimizationOptions);
+                                [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                                recognizedClass = templateNames{winingTemplateIndex, 1};
+                                recognizedLetters(i,j) = recognizedClass;
+                                if recognizedClass == templateNames{i}
+                                    properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                                end
+                                %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                            end
+                            letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
+                            allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
+                        end
+                        %% stop the timer and print time results
+                        tEnd = toc(tStart);
+                        tEndMin = floor(tEnd / 60);
+                        tEndSec = floor(mod(tEnd, 60));
+                        elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
+                        disp(elapsedTimeStr);
+                        %% count the whole accuracy
+                        wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
+                        %disp("letter acc:"+letterRecognitionAccuracy);
+                        %disp("whole acc: "+wholeAccuracy);
+                        %% prepare folder for saving results
+                        disp("Saving results to files ...");
+                        % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
+                        description = innerFolderName;
+                        if isArchiveDir
+                            mkdir(parentFolderName, innerFolderName);
+                        end
+                        %% save results to .xlsx file
+                        currentFolderName = "";
+                        if isArchiveDir
+                            currentFolderName = parentFolderName+"/"+innerFolderName;
+                        end
+                        fileName = "results.xlsx"; %delete(fileName);
+                        fileNameToSave = getProperFileName(fileName, currentFolderName);
+                        saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
+                        %% save confusion matrix to .xlsx file
+                        fileName = "confusionMatrix.xlsx"; %delete(fileName);
+                        fileNameToSave = getProperFileName(fileName, currentFolderName);
+                        saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
+                        % END OF SPECIFIC SCRIPT
+                        disp("---- END of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";metric=" + metric + " script ----");
                     end
-                    %disp(templateNames{i}+") Recognized class: "+recognizedClass);
                 end
-                letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
-                allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
             end
-            %% stop the timer and print time results
-            tEnd = toc(tStart);
-            tEndMin = floor(tEnd / 60);
-            tEndSec = floor(mod(tEnd, 60));
-            elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
-            disp(elapsedTimeStr);
-            %% count the whole accuracy
-            wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
-            %disp("letter acc:"+letterRecognitionAccuracy);
-            %disp("whole acc: "+wholeAccuracy);
-            %% prepare folder for saving results
-            disp("Saving results to files ...");
-            % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-            description = innerFolderName;
-            if isArchiveDir
-                mkdir(parentFolderName, innerFolderName);
-            end
-            %% save results to .xlsx file
-            currentFolderName = "";
-            if isArchiveDir
-                currentFolderName = parentFolderName+"/"+innerFolderName;
-            end
-            fileName = "results.xlsx"; %delete(fileName);
-            fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
-            %% save confusion matrix to .xlsx file
-            fileName = "confusionMatrix.xlsx"; %delete(fileName);
-            fileNameToSave = getProperFileName(fileName, currentFolderName);
-            saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
-            % END OF SPECIFIC SCRIPT
-            disp("---- END of minSurrPoints=" + minSurrPoints + ";maxFunEvals=" + maxFunEvals + ";metric=" + metric + " script ----");
         end
     end 
 end
