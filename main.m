@@ -104,7 +104,7 @@ for metric=metricVector
                        continue;
                     end
                     % START OF SPECIFIC SCRIPT
-                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
+                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
                     allProperlyRecognizedLettersCount = 0;
                     % Prepare 'optimizationOptions' structure (there aren't available 'UseParallel' and 'UseVectorized' options for 'simulannealbnd' optimoptions)
                     optimizationOptions = optimoptions( ...
@@ -166,7 +166,7 @@ for metric=metricVector
                     fileNameToSave = getProperFileName(fileName, currentFolderName);
                     saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
                     % END OF SPECIFIC SCRIPT
-                    disp("---- END of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
+                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
                 end
             end
         end
