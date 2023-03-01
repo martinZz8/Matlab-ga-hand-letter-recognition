@@ -5,8 +5,8 @@ function [] = readAndSaveDataBatch(minNeighborsFraction, selfAdjustmentWeight, s
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "swarmSize";
 	columnItemName = "maxIters";
-	rowItemsVector = [10, 20, 40, 50, 60, 80, 100, 120];
-	columnItemsVector = [50, 100, 200, 400, 600, 800, 1000];
+	rowItemsVector = [10, 30, 50, 80, 120];
+	columnItemsVector = [50, 100, 200, 600, 1000];
 	containsFunc = @(X) (contains(X, "minNgFrac="+minNeighborsFraction) && contains(X, "sfAdjWg="+selfAdjustmentWeight) && contains(X, "soAdjWg="+socialAdjustmentWeight) && contains(X, "metric="+metric));
 	function [dt] = readEffectiveness(filePath)
 		dt = readmatrix(filePath, 'Range', 'L18:L18', 'OutputType','double');
