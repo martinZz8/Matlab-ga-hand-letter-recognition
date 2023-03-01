@@ -1,13 +1,13 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(minNeighborsFraction, selfAdjustmentWeight, socialAdjustmentWeight, metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(annealingFcn, initTemp, metric, isEffectiveness, locationToSave)
 	% Data
-	searchInDirName_ = "archive/particle_swarm/1";
+	searchInDirName_ = "archive/simulated_annealing/1";
 	innerFileName_ = "results_1.xlsx";
-	rowItemName = "swarmSize";
-	columnItemName = "maxIters";
-	rowItemsVector = [10, 20, 40, 50, 60, 80, 100, 120];
-	columnItemsVector = [50, 100, 200, 400, 600, 800, 1000];
-	containsFunc = @(X) (contains(X, "minNgFrac="+minNeighborsFraction) && contains(X, "sfAdjWg="+selfAdjustmentWeight) && contains(X, "soAdjWg="+socialAdjustmentWeight) && contains(X, "metric="+metric));
+	rowItemName = "maxIters";
+	columnItemName = "maxFunEvals";
+	rowItemsVector = [20, 100, 500, 1000, 2000];
+	columnItemsVector = [10, 50, 100, 200, 400, 800, 1200, 1500, 2000];
+	containsFunc = @(X) (contains(X, "annealFcn="+annealingFcn) && contains(X, "initTemp="+initTemp) && contains(X, "metric="+metric));
 	function [dt] = readEffectiveness(filePath)
 		dt = readmatrix(filePath, 'Range', 'L18:L18', 'OutputType','double');
     end
