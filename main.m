@@ -72,10 +72,11 @@ lb = [-320; -240; -180; 0.75; 0.75];
 ub = [320; 240; 180; 1.25; 1.25];
 % lb = [-160; -120; -90; 0.75; 0.75];
 % ub = [160; 120; 90; 1.25; 1.25];
-x0=[0, 0, 0, 1, 1];
-maxFunctionEvaluationsVector = [10, 50, 100, 200, 400, 800, 1200, 1500, 2000];
+x0 = [0, 0, 0, 1, 1];
+maxFunctionEvaluationsVector = [10, 50, 100, 400, 800, 1200, 1500, 2000];
 maxIterationsVector = [20, 100, 500, 1000, 2000];
 annealingFcnVector = ["annealingboltz", "annealingfast"];
+temperatureFcnVector = ["temperatureexp", "temperaturefast", "temperatureboltz"];
 initTempVector = [50, 100, 150];
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
@@ -89,84 +90,88 @@ for metric=metricVector
     for maxFunEvals=maxFunctionEvaluationsVector
         for maxIterations=maxIterationsVector
             for annealingFcn=annealingFcnVector
-                for initTemp=initTempVector
-                    % BYPASS COND
-                    % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
-                    % Prepare parent folder name and inner folder name
-                    parentFolderName = "archive/simulated_annealing/1"; %initial val: archive
-                    innerFolderName =   "maxFunEvals="+maxFunEvals+...
-                                        "_maxIters="+maxIterations+...
-                                        "_annealFcn="+annealingFcn+...
-                                        "_initTemp="+initTemp+...
-                                        "_metric="+metric;
-                    % NOTE: comment this condition if you want to redo the computations
-                    if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
-                       continue;
-                    end
-                    % START OF SPECIFIC SCRIPT
-                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
-                    allProperlyRecognizedLettersCount = 0;
-                    % Prepare 'optimizationOptions' structure (there aren't available 'UseParallel' and 'UseVectorized' options for 'simulannealbnd' optimoptions)
-                    optimizationOptions = optimoptions( ...
-                        'simulannealbnd', ...
-                        'Display', 'off', ...
-                        'MaxFunctionEvaluations', maxFunEvals, ...
-                        'MaxIterations', maxIterations, ...
-                        'AnnealingFcn', annealingFcn, ...
-                        'InitialTemperature', initTemp ...
-                    );
-                    % start the timer
-                    tStart = tic;
-                    % run the patternsearch algorithm for every letter and every person
-                    for i=1:letterNum
-                        disp("Letter: "+templateNames{i});
-                        properlyRecognizedLettersCount = 0;
-                        for j=1:personsNum
-                            fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
-                            rng default;
-                            [Xmin, Jmin] = simulannealbnd(fitnessFunLambda, x0, lb, ub, optimizationOptions);
-                            [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
-                            recognizedClass = templateNames{winingTemplateIndex, 1};
-                            recognizedLetters(i,j) = recognizedClass;
-                            if recognizedClass == templateNames{i}
-                                properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
-                            end
-                            %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                for tempFcn=temperatureFcnVector
+                    for initTemp=initTempVector
+                        % BYPASS COND
+                        % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
+                        % Prepare parent folder name and inner folder name
+                        parentFolderName = "archive/simulated_annealing/1"; %initial val: archive
+                        innerFolderName =   "maxFunEvals="+maxFunEvals+...
+                                            "_maxIters="+maxIterations+...
+                                            "_annealFcn="+annealingFcn+...
+                                            "_tempFcn="+tempFcn+...
+                                            "_initTemp="+initTemp+...
+                                            "_metric="+metric;
+                        % NOTE: comment this condition if you want to redo the computations
+                        if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+                           continue;
                         end
-                        letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
-                        allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
+                        % START OF SPECIFIC SCRIPT
+                        disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";tempFcn=" + tempFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
+                        allProperlyRecognizedLettersCount = 0;
+                        % Prepare 'optimizationOptions' structure (there aren't available 'UseParallel' and 'UseVectorized' options for 'simulannealbnd' optimoptions)
+                        optimizationOptions = optimoptions( ...
+                            'simulannealbnd', ...
+                            'Display', 'off', ...
+                            'MaxFunctionEvaluations', maxFunEvals, ...
+                            'MaxIterations', maxIterations, ...
+                            'AnnealingFcn', annealingFcn, ...
+                            'TemperatureFcn', tempFcn, ...
+                            'InitialTemperature', initTemp ...
+                        );
+                        % start the timer
+                        tStart = tic;
+                        % run the patternsearch algorithm for every letter and every person
+                        for i=1:letterNum
+                            disp("Letter: "+templateNames{i});
+                            properlyRecognizedLettersCount = 0;
+                            for j=1:personsNum
+                                fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                                rng default;
+                                [Xmin, Jmin] = simulannealbnd(fitnessFunLambda, x0, lb, ub, optimizationOptions);
+                                [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                                recognizedClass = templateNames{winingTemplateIndex, 1};
+                                recognizedLetters(i,j) = recognizedClass;
+                                if recognizedClass == templateNames{i}
+                                    properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                                end
+                                %disp(templateNames{i}+") Recognized class: "+recognizedClass);
+                            end
+                            letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
+                            allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
+                        end
+                        %% stop the timer and print time results
+                        tEnd = toc(tStart);
+                        tEndMin = floor(tEnd / 60);
+                        tEndSec = floor(mod(tEnd, 60));
+                        elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
+                        disp(elapsedTimeStr);
+                        %% count the whole accuracy
+                        wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
+                        %disp("letter acc:"+letterRecognitionAccuracy);
+                        %disp("whole acc: "+wholeAccuracy);
+                        %% prepare folder for saving results
+                        disp("Saving results to files ...");
+                        % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
+                        description = innerFolderName;
+                        if isArchiveDir
+                            mkdir(parentFolderName, innerFolderName);
+                        end
+                        %% save results to .xlsx file
+                        currentFolderName = "";
+                        if isArchiveDir
+                            currentFolderName = parentFolderName+"/"+innerFolderName;
+                        end
+                        fileName = "results.xlsx"; %delete(fileName);
+                        fileNameToSave = getProperFileName(fileName, currentFolderName);
+                        saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
+                        %% save confusion matrix to .xlsx file
+                        fileName = "confusionMatrix.xlsx"; %delete(fileName);
+                        fileNameToSave = getProperFileName(fileName, currentFolderName);
+                        saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
+                        % END OF SPECIFIC SCRIPT
+                        disp("---- END of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";tempFcn=" + tempFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
                     end
-                    %% stop the timer and print time results
-                    tEnd = toc(tStart);
-                    tEndMin = floor(tEnd / 60);
-                    tEndSec = floor(mod(tEnd, 60));
-                    elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
-                    disp(elapsedTimeStr);
-                    %% count the whole accuracy
-                    wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
-                    %disp("letter acc:"+letterRecognitionAccuracy);
-                    %disp("whole acc: "+wholeAccuracy);
-                    %% prepare folder for saving results
-                    disp("Saving results to files ...");
-                    % if you want to write to current directory - set 'isArchiveDir' to false (boolean value)
-                    description = innerFolderName;
-                    if isArchiveDir
-                        mkdir(parentFolderName, innerFolderName);
-                    end
-                    %% save results to .xlsx file
-                    currentFolderName = "";
-                    if isArchiveDir
-                        currentFolderName = parentFolderName+"/"+innerFolderName;
-                    end
-                    fileName = "results.xlsx"; %delete(fileName);
-                    fileNameToSave = getProperFileName(fileName, currentFolderName);
-                    saveResults(fileNameToSave, string(templateNames), personsNum, recognizedLetters, [letterRecognitionAccuracy; wholeAccuracy], description, elapsedTimeStr);
-                    %% save confusion matrix to .xlsx file
-                    fileName = "confusionMatrix.xlsx"; %delete(fileName);
-                    fileNameToSave = getProperFileName(fileName, currentFolderName);
-                    saveConfusionMatrix(fileNameToSave, string(templateNames), recognizedLetters, true, description, elapsedTimeStr);
-                    % END OF SPECIFIC SCRIPT
-                    disp("---- START of maxFunEvals=" + maxFunEvals + ";maxIters=" + maxIterations + ";annealFcn=" + annealingFcn + ";initTemp=" + initTemp + ";metric=" + metric + " script ----");
                 end
             end
         end
