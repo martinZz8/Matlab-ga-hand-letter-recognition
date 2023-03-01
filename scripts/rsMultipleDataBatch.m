@@ -41,6 +41,6 @@ function [] = rsMultipleDataBatch()
     end
     % Save times
     for t=timeLocationVector
-        readAndSaveDataBatch(e.minNeighborsFraction, e.selfAdjustmentWeight, e.socialAdjustmentWeight, e.metric, false, e.location);
+        readAndSaveDataBatch(t.minNeighborsFraction, t.selfAdjustmentWeight, t.socialAdjustmentWeight, t.metric, false, t.location);
     end
     disp("All saved!");
