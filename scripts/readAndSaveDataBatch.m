@@ -6,7 +6,7 @@ function [] = readAndSaveDataBatch(annealingFcn, tempFcn, initTemp, metric, isEf
 	rowItemName = "maxIters";
 	columnItemName = "maxFunEvals";
 	rowItemsVector = [20, 100, 500, 1000, 2000];
-	columnItemsVector = [10, 50, 100, 400, 800, 1200, 1500, 2000];
+	columnItemsVector = [10, 50, 100, 400, 1200, 2000];
 	containsFunc = @(X) (contains(X, "annealFcn="+annealingFcn) && contains(X, "tempFcn="+tempFcn) && contains(X, "initTemp="+initTemp) && contains(X, "metric="+metric));
 	function [dt] = readEffectiveness(filePath)
 		dt = readmatrix(filePath, 'Range', 'L18:L18', 'OutputType','double');
