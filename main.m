@@ -85,13 +85,11 @@ maxIterationsVector = [50, 100, 200, 600, 1000];
 minNeighborsFractionVector = [0.25, 0.4];
 selfAdjustmentWeightVector = [1.49, 1.6];
 socialAdjustmentWeightVector = [1.49, 1.6];
-metricVector = ["manhattan", "euclidean"];
+metricVector = ["euclidean"]; %metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 %initSwarmMtx = [0, 0, 0, 1, 1]; %'InitialSwarmMatrix', initSwarmMtx
 valueFuncSetChoose = {
-    @(X, uc, tc) fitnessFun1(X, uc, tc);
     {
-    @(X, uc, tc) fitnessFun2(X, uc, tc);
         @(X, uc, tc) fitnessFun1(X, uc, tc);
         @(X, uc, tc) fitnessFun2(X, uc, tc);
     };
