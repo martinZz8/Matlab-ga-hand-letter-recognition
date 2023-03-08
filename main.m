@@ -2,7 +2,7 @@
 close all;
 clear;
 clc;
-% Change 'useOepnPose' settign to 'true' or 'false'. It determines whether to use MediaPipe or OpenPose data.
+% Change 'useMediaPipe' settign to 'true' or 'false'. It determines whether to use MediaPipe or OpenPose data.
 useMediaPipe = false;
 isArchiveDir = true;
 %% load templates
