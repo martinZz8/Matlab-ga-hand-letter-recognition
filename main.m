@@ -2,8 +2,14 @@
 close all;
 clear;
 clc;
+% Change 'useMediaPipe' settign to 'true' or 'false'. It determines whether to use MediaPipe or OpenPose data.
+useMediaPipe = false;
+isArchiveDir = true;
 %% load templates
-tempFolderName = "templates/";
+tempFolderName = "templates/OpenPose/";
+if useMediaPipe == true
+    tempFolderName = "templates/MediaPipe/";
+end
 tempCloudNames = [
     tempFolderName+"aSkeleton.txt";
     tempFolderName+"bSkeleton.txt";
@@ -48,7 +54,10 @@ templateNames = { ...
 %% get point cloud of every letter and every person
 % don't initialize (or change the number) 'unknownClouds' when number of persons in each dataset/letter folders are other than 10
 unknownClouds = cell(templatesCloudsLength,10);
-datasetLocation = "dataset/";
+datasetLocation = "dataset/OpenPose/";
+if useMediaPipe == true
+    datasetLocation = "dataset/MediaPipe/";
+end
 for i=1:templatesCloudsLength
     datasetLocationLetter = datasetLocation+templateNames{i}+"/";
     d = dir(datasetLocationLetter+"*.txt");
@@ -62,7 +71,6 @@ for i=1:templatesCloudsLength
     end
 end
 %% define & solve optmization problem for every letter and every person; also count the accuracy for every letter
-isArchiveDir = true;
 % specify the recognizedLetters string matrix
 [letterNum, personsNum] = size(unknownClouds);
 recognizedLetters = string(zeros(letterNum,personsNum));
@@ -77,10 +85,20 @@ maxFunctionEvaluationsVector = [60, 100, 150, 250, 350];
 metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 %initPointsMtx = [0, 0, 0, 1, 1]; %'InitialPoints', initPointsMtx
-valueFuncSet = {
-    @(X, uc, tc) fitnessFun1(X, uc, tc);
-    @(X, uc, tc) fitnessFun2(X, uc, tc);
+valueFuncSetChoose = {
+    {
+        @(X, uc, tc) fitnessFun1(X, uc, tc);
+        @(X, uc, tc) fitnessFun2(X, uc, tc);
+    };
+    {
+        @(X, uc, tc) fitnessFun1All(X, uc, tc);
+        @(X, uc, tc) fitnessFun2All(X, uc, tc);
+    }
 };
+valueFuncSet = valueFuncSetChoose{1};
+if useMediaPipe == true
+    valueFuncSet = valueFuncSetChoose{2};
+end
 metricMap = containers.Map(keyFuncSet,valueFuncSet);
 for metric=metricVector
     fitnessFunHandle = metricMap(metric);
@@ -89,7 +107,10 @@ for metric=metricVector
             % BYPASS COND
             % ... Checking if results in specific folder are present (by checking only the number of elements inside specific folder)
             % Prepare parent folder name and inner folder name
-            parentFolderName = "archive/surrogate/1"; %initial val: archive
+            parentFolderName = "archive/surrogate/OpenPose/1"; %initial val: archive
+            if useMediaPipe == true
+                parentFolderName = "archive/surrogate/MediaPipe/1";
+            end
             innerFolderName =   "minSurrPoints="+minSurrPoints+...
                                 "_maxFunEvals="+maxFunEvals+...
                                 "_metric="+metric;

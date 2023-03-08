@@ -1,7 +1,10 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave, useMediaPipe)
 	% Data
-	searchInDirName_ = "archive/surrogate/1";
+    searchInDirName_ = "archive/surrogate/OpenPose/1";
+    if useMediaPipe == true
+        searchInDirName_ = "archive/surrogate/MediaPipe/1";
+    end
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "maxFunEvals";
 	columnItemName = "minSurrPoints";
