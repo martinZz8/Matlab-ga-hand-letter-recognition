@@ -1,4 +1,4 @@
-% 'useOpenPose': pass 'true' or 'false' to determine which data to move
+% 'useMediaPipe': pass 'true' or 'false' to determine which data to move
 function [] = rsMultipleDataBatch(useMediaPipe)
     effectivenessLocationVector = [
         struct("minNeighborsFraction", "0.25", "selfAdjustmentWeight", "1.49", "socialAdjustmentWeight", "1.49", "metric", "manhattan", "location", "I10"), ...

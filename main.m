@@ -129,7 +129,6 @@ for metric=metricVector
                         if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
                            continue;
                         end
-                        
                         % START OF SPECIFIC SCRIPT
                         % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
                         disp("---- START of swarmSize=" + swarmSize + ";maxIters=" + maxIterations + ";minNgFrac=" + minNeighborsFraction + ";sfAdjWg=" + selfAdjustmentWeight + ";soAdjWg=" + socialAdjustmentWeight + ";metric=" + metric + " script ----");
