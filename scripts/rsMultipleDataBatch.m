@@ -1,4 +1,5 @@
-function [] = rsMultipleDataBatch()
+% 'useMediaPipe': pass 'true' or 'false' to determine which data to move
+function [] = rsMultipleDataBatch(useMediaPipe)
     effectivenessLocationVector = [
         struct("plM", "GPSPositiveBasis2N", "plOA", "Consecutive", "metric", "manhattan", "location", "C11"), ...
         struct("plM", "GPSPositiveBasis2N", "plOA", "Consecutive", "metric", "euclidean", "location", "C45"), ...
@@ -45,10 +46,10 @@ function [] = rsMultipleDataBatch()
     ];
     % Save effectivenesses
     for e=effectivenessLocationVector
-        readAndSaveDataBatch(e.plM, e.plOA, e.metric, true, e.location);
+        readAndSaveDataBatch(e.plM, e.plOA, e.metric, true, e.location, useMediaPipe);
     end
     % Save times
     for t=timeLocationVector
-        readAndSaveDataBatch(t.plM, t.plOA, t.metric, false, t.location);
+        readAndSaveDataBatch(t.plM, t.plOA, t.metric, false, t.location, useMediaPipe);
     end
     disp("All saved!");

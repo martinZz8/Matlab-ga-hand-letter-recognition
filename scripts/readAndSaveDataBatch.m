@@ -1,7 +1,10 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(plM, plOA, metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(plM, plOA, metric, isEffectiveness, locationToSave, useMediaPipe)
 	% Data
-	searchInDirName_ = "archive/pattern_search/1";
+    searchInDirName_ = "archive/pattern_search/OpenPose/1";
+    if useMediaPipe == true
+        searchInDirName_ = "archive/pattern_search/MediaPipe/1";
+    end
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "maxIt";
 	columnItemName = "funEv";
