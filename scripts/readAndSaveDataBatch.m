@@ -1,7 +1,10 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(minNeighborsFraction, selfAdjustmentWeight, socialAdjustmentWeight, metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(minNeighborsFraction, selfAdjustmentWeight, socialAdjustmentWeight, metric, isEffectiveness, locationToSave, useMediaPipe)
 	% Data
-	searchInDirName_ = "archive/particle_swarm/1";
+    searchInDirName_ = "archive/particle_swarm/OpenPose/1";
+    if useMediaPipe == true
+        searchInDirName_ = "archive/particle_swarm/MediaPipe/1";
+    end
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "swarmSize";
 	columnItemName = "maxIters";

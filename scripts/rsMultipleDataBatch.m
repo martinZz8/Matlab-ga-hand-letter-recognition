@@ -1,4 +1,5 @@
-function [] = rsMultipleDataBatch()
+% 'useOpenPose': pass 'true' or 'false' to determine which data to move
+function [] = rsMultipleDataBatch(useMediaPipe)
     effectivenessLocationVector = [
         struct("minNeighborsFraction", "0.25", "selfAdjustmentWeight", "1.49", "socialAdjustmentWeight", "1.49", "metric", "manhattan", "location", "I10"), ...
         struct("minNeighborsFraction", "0.25", "selfAdjustmentWeight", "1.49", "socialAdjustmentWeight", "1.49", "metric", "euclidean", "location", "I48"), ...
@@ -37,10 +38,10 @@ function [] = rsMultipleDataBatch()
     ];
     % Save effectivenesses
     for e=effectivenessLocationVector
-        readAndSaveDataBatch(e.minNeighborsFraction, e.selfAdjustmentWeight, e.socialAdjustmentWeight, e.metric, true, e.location);
+        readAndSaveDataBatch(e.minNeighborsFraction, e.selfAdjustmentWeight, e.socialAdjustmentWeight, e.metric, true, e.location, useMediaPipe);
     end
     % Save times
     for t=timeLocationVector
-        readAndSaveDataBatch(t.minNeighborsFraction, t.selfAdjustmentWeight, t.socialAdjustmentWeight, t.metric, false, t.location);
+        readAndSaveDataBatch(t.minNeighborsFraction, t.selfAdjustmentWeight, t.socialAdjustmentWeight, t.metric, false, t.location, useMediaPipe);
     end
     disp("All saved!");
