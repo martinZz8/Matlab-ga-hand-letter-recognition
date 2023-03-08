@@ -126,9 +126,9 @@ for metric=metricVector
                                 "_pop="+populationSize+...
                                 "_metric="+metric;
             % NOTE: comment this condition if you want to redo the computations
-%             if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
-%                continue;
-%             end
+            if isFolderCreatedNotEmpty(parentFolderName, innerFolderName)
+               continue;
+            end
             % START OF SPECIFIC SCRIPT
             % ... NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically)
             disp("---- START of gen="+ maxGenerations + ";pop=" + populationSize + ";metric=" + metric + " script ----");
