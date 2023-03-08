@@ -1,7 +1,10 @@
 % Example invocation: readAndSaveDataBatch("manhattan", true, 'C9'); OR readAndSaveDataBatch("manhattan", false, 'M17');
-function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(metric, isEffectiveness, locationToSave, useMediaPipe)
 	% Data
-	searchInDirName_ = "archive/ga/1";
+	searchInDirName_ = "archive/ga/OpenPose/1";
+    if useMediaPipe == true
+        searchInDirName_ = "archive/ga/MediaPipe/1";
+    end
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "gen";
 	columnItemName = "pop";
