@@ -1,4 +1,5 @@
-function [] = rsMultipleDataBatch()
+% 'useMediaPipe': pass 'true' or 'false' to determine which data to move
+function [] = rsMultipleDataBatch(useMediaPipe)
     effectivenessLocationVector = [
         struct("annealingFcn", "annealingboltz", "tempFcn", "temperatureexp", "initTemp", "50", "metric", "manhattan", "location", "C11"), ...
         struct("annealingFcn", "annealingboltz", "tempFcn", "temperatureexp", "initTemp", "50", "metric", "euclidean", "location", "C42"), ...
@@ -77,10 +78,10 @@ function [] = rsMultipleDataBatch()
     ];
     % Save effectivenesses
     for e=effectivenessLocationVector
-        readAndSaveDataBatch(e.annealingFcn, e.tempFcn, e.initTemp, e.metric, true, e.location);
+        readAndSaveDataBatch(e.annealingFcn, e.tempFcn, e.initTemp, e.metric, true, e.location, useMediaPipe);
     end
     % Save times
     for t=timeLocationVector
-        readAndSaveDataBatch(t.annealingFcn, t.tempFcn, t.initTemp, t.metric, false, t.location);
+        readAndSaveDataBatch(t.annealingFcn, t.tempFcn, t.initTemp, t.metric, false, t.location, useMediaPipe);
     end
     disp("All saved!");

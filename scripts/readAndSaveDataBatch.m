@@ -1,7 +1,10 @@
 % Example invocation: readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", true, 'C11'); OR readAndSaveDataBatch("GPSPositiveBasis2N", "Consecutive", "manhattan", false, 'K21');
-function [] = readAndSaveDataBatch(annealingFcn, tempFcn, initTemp, metric, isEffectiveness, locationToSave)
+function [] = readAndSaveDataBatch(annealingFcn, tempFcn, initTemp, metric, isEffectiveness, locationToSave, useMediaPipe)
 	% Data
-	searchInDirName_ = "archive/simulated_annealing/1";
+    searchInDirName_ = "archive/simulated_annealing/OpenPose/1";
+    if useMediaPipe == true
+        searchInDirName_ = "archive/simulated_annealing/MediaPipe/1";
+    end
 	innerFileName_ = "results_1.xlsx";
 	rowItemName = "maxIters";
 	columnItemName = "maxFunEvals";
