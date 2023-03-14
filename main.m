@@ -85,7 +85,7 @@ maxIterationsVector = [50, 100, 200, 600, 1000];
 minNeighborsFractionVector = [0.25, 0.4];
 selfAdjustmentWeightVector = [1.49, 1.6];
 socialAdjustmentWeightVector = [1.49, 1.6];
-metricVector = ["euclidean"]; %metricVector = ["manhattan", "euclidean"];
+metricVector = ["manhattan", "euclidean"];
 keyFuncSet = ["manhattan", "euclidean"];
 %initSwarmMtx = [0, 0, 0, 1, 1]; %'InitialSwarmMatrix', initSwarmMtx
 valueFuncSetChoose = {
