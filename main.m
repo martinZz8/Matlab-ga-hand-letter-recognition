@@ -121,6 +121,7 @@ for metric=metricVector
             % START OF SPECIFIC SCRIPT
             % NOTE: Run 'parpool' or 'parpool('local')' when 'UseParallel' is set to 'true' (when parallel pools aren't set in settings to create automatically).
             disp("---- START of minSurrPoints=" + minSurrPoints + ";maxFunEvals=" + maxFunEvals + ";metric=" + metric + " script ----");
+            allNumOfUsedPersons = 0;
             allProperlyRecognizedLettersCount = 0;
             % Prepare 'optimizationOptions' structure
             optimizationOptions = optimoptions( ...
@@ -137,20 +138,27 @@ for metric=metricVector
             % run the patternsearch algorithm for every letter and every person
             for i=1:letterNum
                 disp("Letter: "+templateNames{i});
+                numOfUsedPersons = 0;
                 properlyRecognizedLettersCount = 0;
                 for j=1:personsNum
-                    fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
-                    rng default;
-                    [Xmin, Jmin] = surrogateopt(fitnessFunLambda, lb, ub, [], [], [], [], [], optimizationOptions);
-                    [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
-                    recognizedClass = templateNames{winingTemplateIndex, 1};
-                    recognizedLetters(i,j) = recognizedClass;
-                    if recognizedClass == templateNames{i}
-                        properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                    if ~isempty(unknownClouds{i,j})
+                        fitnessFunLambda = @(X) fitnessFunHandle(X, unknownClouds{i,j}, templateClouds);
+                        rng default;
+                        [Xmin, Jmin] = surrogateopt(fitnessFunLambda, lb, ub, [], [], [], [], [], optimizationOptions);
+                        [~, ~, winingTemplateIndex] = fitnessFunHandle(Xmin, unknownClouds{i,j}, templateClouds);
+                        recognizedClass = templateNames{winingTemplateIndex, 1};
+                        recognizedLetters(i,j) = recognizedClass;
+                        numOfUsedPersons = numOfUsedPersons + 1;
+                        if recognizedClass == templateNames{i}
+                            properlyRecognizedLettersCount = properlyRecognizedLettersCount + 1;
+                        end
+                        %disp(templateNames{i}+") Recognized class: "+recognizedClass);
                     end
-                    %disp(templateNames{i}+") Recognized class: "+recognizedClass);
                 end
-                letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/personsNum)*100;
+                if numOfUsedPersons > 0
+                    letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/numOfUsedPersons)*100;
+                end
+                allNumOfUsedPersons = allNumOfUsedPersons + numOfUsedPersons;
                 allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
             end
             %% stop the timer and print time results
@@ -160,7 +168,10 @@ for metric=metricVector
             elapsedTimeStr = "Elapsed time: "+tEndMin+" min "+tEndSec+" sec; In seconds: "+tEnd+" sec";
             disp(elapsedTimeStr);
             %% count the whole accuracy
-            wholeAccuracy = (allProperlyRecognizedLettersCount/(letterNum*personsNum))*100;
+            wholeAccuracy = 0;
+            if allNumOfUsedPersons > 0
+                wholeAccuracy = (allProperlyRecognizedLettersCount/allNumOfUsedPersons)*100;
+            end
             %disp("letter acc:"+letterRecognitionAccuracy);
             %disp("whole acc: "+wholeAccuracy);
             %% prepare folder for saving results
