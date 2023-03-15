@@ -1,6 +1,6 @@
 % Uses standard subtract to establish dimension between two points (manhattan metric)
 function [J, transformedCloud, winningTemplateIndex] = fitnessFun1All(X, unknownCloud, templateClouds)
-[transformedCloud] = fitnessFunBase(X, unknownCloud);
+[transformedCloud] = fitnessFunBase(X, unknownCloud, true);
 
 templatesCount = numel(templateClouds);
 Js = zeros(templatesCount, 1);
