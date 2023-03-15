@@ -1,6 +1,6 @@
 % Uses euclidean function to establish dimension between two points (euclidean metric)
 function [J, transformedCloud, winningTemplateIndex] = fitnessFun2All(X, unknownCloud, templateClouds)
-[transformedCloud] = fitnessFunBase(X, unknownCloud);
+[transformedCloud] = fitnessFunBase(X, unknownCloud, true);
 
 % exclude last point in last index (duplicated point on smallest finger)
 templatesCount = numel(templateClouds);
