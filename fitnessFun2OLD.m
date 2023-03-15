@@ -1,6 +1,6 @@
 % Uses euclidean function to establish dimension between two points (euclidean metric)
 function [J, transformedCloud, winningTemplateIndex] = fitnessFun2OLD(X, unknownCloud, templateClouds)
-[transformedCloud] = fitnessFunBase(X, unknownCloud);
+[transformedCloud] = fitnessFunBase(X, unknownCloud, false);
 
 templatesCount = numel(templateClouds);
 Js = zeros(templatesCount, 1);
