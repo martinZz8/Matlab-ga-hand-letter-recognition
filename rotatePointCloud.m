@@ -1,4 +1,6 @@
-function [targetPointCloud] = rotatePointCloud(sourcePointCloud, cx, cy, cz, angleOX, angleOY, angleOZ, isAngleInDegree)
+function [targetPointCloud] = rotatePointCloud(sourcePointCloud, angleOX, angleOY, angleOZ, isAngleInDegree)
+% get center of gravity
+[cx, cy, cz] = getPointCloudCoG(sourcePointCloud);
 % translation by [-cx, -cy, -cz]
 tform = rigidtform3d(eye(3,3), [-cx, -cy, -cz]); 
 translatedCloud = pctransform(sourcePointCloud, tform);
