@@ -73,7 +73,8 @@ end
 %% define & solve optmization problem for every letter and every person; also count the accuracy for every letter
 % specify the recognizedLetters string matrix
 [letterNum, personsNum] = size(unknownClouds);
-recognizedLetters = string(zeros(letterNum,personsNum));
+recognizedLetters = strings(letterNum,personsNum); %string(zeros(letterNum,personsNum))
+recognizedLetters(:,:) = "-";
 letterRecognitionAccuracy = zeros(letterNum,1);
 % options for ga algorithm
 lb = [-320; -240; -180; 0.75; 0.75];
@@ -166,7 +167,7 @@ for metric=metricVector
                     end
                 end
                 if numOfUsedPersons > 0
-                    letterRecognitionAccuracy(i) = (properlyRecognizedLettersCount/numOfUsedPersons)*100;
+                    letterRecognitionAccuracy(i) = round((properlyRecognizedLettersCount/numOfUsedPersons)*100, 2);
                 end
                 allNumOfUsedPersons = allNumOfUsedPersons + numOfUsedPersons;
                 allProperlyRecognizedLettersCount = allProperlyRecognizedLettersCount + properlyRecognizedLettersCount;
@@ -180,7 +181,7 @@ for metric=metricVector
             %% count the whole accuracy
             wholeAccuracy = 0;
             if allNumOfUsedPersons > 0
-                wholeAccuracy = (allProperlyRecognizedLettersCount/allNumOfUsedPersons)*100;
+                wholeAccuracy = round((allProperlyRecognizedLettersCount/allNumOfUsedPersons)*100, 2);
             end
             %disp("letter acc:"+letterRecognitionAccuracy);
             %disp("whole acc: "+wholeAccuracy);
