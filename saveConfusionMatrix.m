@@ -19,6 +19,7 @@ writematrix(lettersVector', fileName, 'Range', 'C2');
 % create the confusion matrix
 [rowNum, colNum] = size(resultMatrix);
 confusionMatrix = zeros(rowNum);
+personsPerLetterCounter = zeros(rowNum,1);
 for i=1:rowNum
     actLetter = lettersVector(i);
     for j=1:colNum
@@ -29,6 +30,7 @@ for i=1:rowNum
         %disp("row:"+rowIdx+" col:"+colIdx);
         if rowIdx > 0 && colIdx > 0
             confusionMatrix(rowIdx, colIdx) = confusionMatrix(rowIdx, colIdx) + 1;
+            personsPerLetterCounter(colIdx) = personsPerLetterCounter(colIdx) + 1;
         end
     end
 end
@@ -36,7 +38,7 @@ end
 if isPercentage
     for i=1:rowNum
         for j=1:rowNum
-            confusionMatrix(i,j) = (confusionMatrix(i,j)/colNum)*100;
+            confusionMatrix(i,j) = round((confusionMatrix(i,j)/personsPerLetterCounter(j))*100, 2);
         end
     end
 end
