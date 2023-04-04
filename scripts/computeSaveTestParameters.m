@@ -46,9 +46,9 @@ function [] = computeSaveTestParameters(effectivenessRange, timeRange, useMediaP
         stDev = sqrt(diffSum/pN);
     end
 	%% Constants
-    searchInDirName_ = "archive/ga/OpenPose/1";
+    searchInDirName_ = "archive/particle_swarm/OpenPose/1";
     if useMediaPipe == true
-        searchInDirName_ = "archive/ga/MediaPipe/1";
+        searchInDirName_ = "archive/particle_swarm/MediaPipe/1";
     end
     %% Read data from .xlsx file
     fileReadPath = searchInDirName_+"/RESULTS1.xlsx";
