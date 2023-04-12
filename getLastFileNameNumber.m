@@ -16,7 +16,10 @@ if length(splittedText) > 1
         name = convertCharsToStrings(d(i).name);
         splittedText2 = name.split(".");
         splittedText3 = splittedText2(1).split("_");
-        fileNum = str2double(splittedText3(2));
+		fileNum = 0;
+		if length(splittedText3) > 1
+			fileNum = str2double(splittedText3(2));
+		end
         %disp(i+") fileNum: "+fileNum);
         % OLD VERSION WITH FILE NAMES LIKE: results1.xlsx
         % -- ver 1 --
