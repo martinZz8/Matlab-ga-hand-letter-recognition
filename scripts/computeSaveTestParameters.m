@@ -82,7 +82,9 @@ function [] = computeSaveTestParameters(effectivenessRange, timeRange, useMediaP
     % Standard deviation
     stDevTm = computeStandardDeviation(dTm, meanTm);
     %% Save data to .txt file
-    fileWritePath = searchInDirName_+"/computedVals.txt";
+    %fileWritePath = searchInDirName_+"/computedVals.txt";
+    outputFileName = "computedVals.txt";
+	fileWritePath = getProperFileName(outputFileName, searchInDirName_);
     % Create effectiveness description
     effDesc = "Effectiveness: min="+minEff+", max="+maxEff+", mean="+round(meanEff, 2)+", median="+round(medianEff, 2)+", stDev="+round(stDevEff, 2);
     disp(effDesc);
