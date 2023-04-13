@@ -1,6 +1,6 @@
 % Example invocations:
 % OpenPose: computeSaveTestParameters("BO10:BS14", "BW19:CA23", false)
-% MediaPipe: computeSaveTestParameters("...", "...", true)
+% MediaPipe: computeSaveTestParameters("CE39:CI43", "CM48:CQ52", true)
 function [] = computeSaveTestParameters(effectivenessRange, timeRange, useMediaPipe)
     % n, sum and NaNCounter computation function
     function [n, sum, nanCounter] = computeNSumNanCounter(mtx)
